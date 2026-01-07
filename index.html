@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Live GPS Location Scanner</title>
+    <title>Location Access & QR Generator</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
@@ -48,24 +48,6 @@
         .header p {
             color: #555;
             font-size: 1.1rem;
-        }
-        
-        .gps-status {
-            background: #f0f8ff;
-            padding: 15px;
-            border-radius: 10px;
-            margin: 15px 0;
-            text-align: center;
-            display: none;
-        }
-        
-        .gps-status.active {
-            display: block;
-        }
-        
-        .gps-status i {
-            color: #1a2980;
-            margin-right: 10px;
         }
         
         .main-content {
@@ -172,14 +154,6 @@
             transform: translateY(-1px);
         }
         
-        .button.secondary {
-            background: linear-gradient(to right, #6a11cb, #2575fc);
-        }
-        
-        .button.success {
-            background: linear-gradient(to right, #00b09b, #96c93d);
-        }
-        
         .status-message {
             padding: 15px;
             border-radius: 10px;
@@ -228,31 +202,29 @@
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
         }
         
-        .location-info {
+        .gps-info {
             display: flex;
-            flex-wrap: wrap;
-            gap: 15px;
+            justify-content: space-between;
+            background-color: #f0f8ff;
+            padding: 15px;
+            border-radius: 10px;
             margin-bottom: 20px;
         }
         
-        .location-card {
-            flex: 1;
-            min-width: 200px;
-            background: #f0f8ff;
-            padding: 15px;
-            border-radius: 10px;
+        .gps-info div {
             text-align: center;
         }
         
-        .location-card h4 {
+        .gps-info div span {
+            display: block;
+            font-weight: 600;
             color: #1a2980;
-            margin-bottom: 10px;
+            font-size: 1.2rem;
         }
         
-        .coordinates {
-            font-family: monospace;
-            font-size: 14px;
-            color: #333;
+        .gps-info div label {
+            font-size: 0.9rem;
+            color: #666;
         }
         
         .distance-info {
@@ -267,43 +239,6 @@
             font-weight: 600;
             color: #1a2980;
             font-size: 1.2rem;
-        }
-        
-        .live-gps-info {
-            background: #e8f4fc;
-            border-left: 4px solid #1a2980;
-            padding: 15px;
-            border-radius: 0 10px 10px 0;
-            margin: 20px 0;
-        }
-        
-        .live-gps-info h4 {
-            color: #1a2980;
-            margin-bottom: 10px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .live-gps-info .pulse {
-            display: inline-block;
-            width: 10px;
-            height: 10px;
-            background-color: #ff4757;
-            border-radius: 50%;
-            animation: pulse 1.5s infinite;
-        }
-        
-        @keyframes pulse {
-            0% { transform: scale(0.95); opacity: 0.7; }
-            50% { transform: scale(1.1); opacity: 1; }
-            100% { transform: scale(0.95); opacity: 0.7; }
-        }
-        
-        .accuracy-info {
-            font-size: 12px;
-            color: #666;
-            margin-top: 5px;
         }
         
         @media (max-width: 768px) {
@@ -324,130 +259,77 @@
             padding-top: 20px;
             border-top: 1px solid #eee;
         }
-        
-        .gps-accuracy {
-            height: 10px;
-            background: #eee;
-            border-radius: 5px;
-            margin-top: 5px;
-            overflow: hidden;
-        }
-        
-        .gps-accuracy-fill {
-            height: 100%;
-            background: linear-gradient(to right, #ff4757, #2ed573);
-            width: 0%;
-            transition: width 1s;
-        }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1><i class="fas fa-satellite"></i> Live GPS Location Scanner</h1>
-            <p>This system uses your phone's LIVE GPS location (not IP-based location) for accurate verification</p>
-        </div>
-        
-        <div id="gpsStatus" class="gps-status">
-            <i class="fas fa-satellite-dish"></i>
-            <span id="gpsStatusText">GPS is active. Getting your live location...</span>
+            <h1><i class="fas fa-map-marker-alt"></i> GPS Location Scanner</h1>
+            <p>Set your location and radius, then verify if you're within the allowed area to generate a QR code</p>
         </div>
         
         <div class="main-content">
             <div class="setup-section">
-                <h2 class="section-title"><i class="fas fa-cogs"></i> Setup Your Home Location</h2>
+                <h2 class="section-title"><i class="fas fa-cogs"></i> Setup Location & Radius</h2>
                 
-                <div class="location-card">
-                    <h4>Your Home Location</h4>
-                    <div class="coordinates">
-                        <div>Latitude: <span id="homeLatDisplay">24.683258</span></div>
-                        <div>Longitude: <span id="homeLngDisplay">80.541967</span></div>
-                    </div>
+                <div class="input-group">
+                    <label for="latitude">Latitude</label>
+                    <input type="number" id="latitude" step="any" placeholder="e.g., 28.6139">
                 </div>
                 
                 <div class="input-group">
-                    <label for="radius">Allowed Radius (in meters)</label>
-                    <input type="number" id="radius" value="567">
+                    <label for="longitude">Longitude</label>
+                    <input type="number" id="longitude" step="any" placeholder="e.g., 77.2090">
+                </div>
+                
+                <div class="input-group">
+                    <label for="radius">Radius</label>
+                    <input type="number" id="radius" placeholder="e.g., 100">
                     
                     <div class="unit-selector">
-                        <div class="unit-option selected" id="unit-meters">Meters</div>
-                        <div class="unit-option" id="unit-km">Kilometers</div>
+                        <div class="unit-option" id="unit-meters">Meters</div>
+                        <div class="unit-option selected" id="unit-km">Kilometers</div>
                     </div>
-                </div>
-                
-                <div class="input-group">
-                    <label for="accuracyThreshold">GPS Accuracy Threshold (meters)</label>
-                    <input type="number" id="accuracyThreshold" value="50">
-                    <small>Lower values = more precise but may take longer to get location</small>
                 </div>
                 
                 <button class="button" id="saveLocationBtn">
-                    <i class="fas fa-save"></i> Save Settings
-                </button>
-                
-                <button class="button secondary" id="useCurrentLocationBtn">
-                    <i class="fas fa-map-marker-alt"></i> Use My Current Location as Home
+                    <i class="fas fa-save"></i> Save Location & Radius
                 </button>
                 
                 <div id="setupStatus" class="status-message"></div>
             </div>
             
             <div class="verification-section">
-                <h2 class="section-title"><i class="fas fa-search-location"></i> Live GPS Verification</h2>
+                <h2 class="section-title"><i class="fas fa-satellite-dish"></i> Verify Location & Generate QR</h2>
                 
-                <div class="live-gps-info">
-                    <h4><span class="pulse"></span> Live GPS Location</h4>
-                    <div class="coordinates">
-                        <div>Latitude: <span id="currentLat">--</span></div>
-                        <div>Longitude: <span id="currentLng">--</span></div>
-                        <div>Accuracy: <span id="currentAccuracy">--</span> meters</div>
+                <div class="gps-info">
+                    <div>
+                        <label>Your Latitude</label>
+                        <span id="currentLat">--</span>
                     </div>
-                    <div class="gps-accuracy">
-                        <div class="gps-accuracy-fill" id="accuracyBar"></div>
-                    </div>
-                    <div class="accuracy-info">Lower accuracy values are better (more precise)</div>
-                </div>
-                
-                <div class="location-info">
-                    <div class="location-card">
-                        <h4>Home Location</h4>
-                        <div class="coordinates">
-                            <div>Lat: 24.683258</div>
-                            <div>Lng: 80.541967</div>
-                        </div>
-                    </div>
-                    
-                    <div class="location-card">
-                        <h4>Your Location</h4>
-                        <div class="coordinates">
-                            <div>Lat: <span id="displayLat">--</span></div>
-                            <div>Lng: <span id="displayLng">--</span></div>
-                        </div>
+                    <div>
+                        <label>Your Longitude</label>
+                        <span id="currentLng">--</span>
                     </div>
                 </div>
                 
-                <button class="button success" id="startTrackingBtn">
-                    <i class="fas fa-play-circle"></i> Start Live GPS Tracking
-                </button>
-                
-                <button class="button" id="stopTrackingBtn">
-                    <i class="fas fa-stop-circle"></i> Stop Tracking
+                <button class="button" id="checkLocationBtn">
+                    <i class="fas fa-search-location"></i> Check My Location
                 </button>
                 
                 <div id="verificationStatus" class="status-message"></div>
                 
                 <div class="distance-info">
-                    <label>Distance from Home</label>
-                    <span id="distance">--</span> meters
-                    <div id="distanceMessage"></div>
+                    <label>Distance from Allowed Location</label>
+                    <span id="distance">--</span>
                 </div>
                 
                 <div class="qr-container" id="qrContainer">
-                    <h3><i class="fas fa-qrcode"></i> Access Granted QR Code</h3>
+                    <h3><i class="fas fa-qrcode"></i> Your Generated QR Code</h3>
                     <div class="qr-code" id="qrCode">
                         <!-- QR code will be generated here -->
                     </div>
-                    <p>This QR code is only generated when you're within the allowed radius</p>
+                    <p>Scan this QR code for verification</p>
                     <button class="button" id="downloadQRBtn" style="margin-top: 15px; max-width: 200px;">
                         <i class="fas fa-download"></i> Download QR
                     </button>
@@ -456,225 +338,147 @@
         </div>
         
         <div class="footer">
-            <p><i class="fas fa-info-circle"></i> This system uses your phone's actual GPS (not IP location). For best results:</p>
-            <p>1. Enable GPS/Location on your phone<br>
-               2. Go outside or near a window<br>
-               3. Allow location access in browser permissions</p>
+            <p>This system works entirely in your browser - no data is sent to any server</p>
+            <p>Made with HTML, CSS, and JavaScript <i class="fas fa-heart" style="color:#e74c3c;"></i></p>
         </div>
     </div>
 
     <script>
         // DOM Elements
-        const homeLatDisplay = document.getElementById('homeLatDisplay');
-        const homeLngDisplay = document.getElementById('homeLngDisplay');
+        const latitudeInput = document.getElementById('latitude');
+        const longitudeInput = document.getElementById('longitude');
         const radiusInput = document.getElementById('radius');
-        const accuracyThresholdInput = document.getElementById('accuracyThreshold');
         const unitMeters = document.getElementById('unit-meters');
         const unitKm = document.getElementById('unit-km');
         const saveLocationBtn = document.getElementById('saveLocationBtn');
-        const useCurrentLocationBtn = document.getElementById('useCurrentLocationBtn');
         const setupStatus = document.getElementById('setupStatus');
-        const gpsStatus = document.getElementById('gpsStatus');
-        const gpsStatusText = document.getElementById('gpsStatusText');
-        const startTrackingBtn = document.getElementById('startTrackingBtn');
-        const stopTrackingBtn = document.getElementById('stopTrackingBtn');
+        const checkLocationBtn = document.getElementById('checkLocationBtn');
         const currentLatElement = document.getElementById('currentLat');
         const currentLngElement = document.getElementById('currentLng');
-        const currentAccuracyElement = document.getElementById('currentAccuracy');
-        const displayLatElement = document.getElementById('displayLat');
-        const displayLngElement = document.getElementById('displayLng');
-        const accuracyBar = document.getElementById('accuracyBar');
         const verificationStatus = document.getElementById('verificationStatus');
         const distanceElement = document.getElementById('distance');
-        const distanceMessage = document.getElementById('distanceMessage');
         const qrContainer = document.getElementById('qrContainer');
         const qrCodeElement = document.getElementById('qrCode');
         const downloadQRBtn = document.getElementById('downloadQRBtn');
         
         // State variables
-        let savedLocation = { lat: 24.683258, lng: 80.541967 }; // Default home location
-        let savedRadius = 567; // Default radius in meters
-        let accuracyThreshold = 50; // Default accuracy threshold
+        let savedLocation = null;
+        let savedRadius = null;
+        let radiusUnit = 'km'; // Default unit
         let currentLocation = null;
-        let watchId = null;
-        let isTracking = false;
         
         // Set up event listeners for unit selection
         unitMeters.addEventListener('click', () => {
             unitMeters.classList.add('selected');
             unitKm.classList.remove('selected');
+            radiusUnit = 'meters';
         });
         
         unitKm.addEventListener('click', () => {
             unitKm.classList.add('selected');
             unitMeters.classList.remove('selected');
-            // Convert radius to km if needed
-            if (radiusInput.value) {
-                radiusInput.value = (parseFloat(radiusInput.value) / 1000).toFixed(3);
-            }
+            radiusUnit = 'km';
         });
         
-        // Save settings
+        // Save location and radius
         saveLocationBtn.addEventListener('click', () => {
+            const lat = parseFloat(latitudeInput.value);
+            const lng = parseFloat(longitudeInput.value);
             const radius = parseFloat(radiusInput.value);
-            const accuracy = parseFloat(accuracyThresholdInput.value);
             
-            if (isNaN(radius) || radius <= 0) {
-                showStatus(setupStatus, 'Please enter a valid radius (positive number).', 'error');
+            if (isNaN(lat) || isNaN(lng) || isNaN(radius)) {
+                showStatus(setupStatus, 'Please enter valid latitude, longitude, and radius values.', 'error');
                 return;
             }
             
-            if (isNaN(accuracy) || accuracy < 1) {
-                showStatus(setupStatus, 'Please enter a valid accuracy threshold (at least 1 meter).', 'error');
+            if (lat < -90 || lat > 90) {
+                showStatus(setupStatus, 'Latitude must be between -90 and 90 degrees.', 'error');
                 return;
             }
             
-            // Convert radius to meters if in km
-            if (unitKm.classList.contains('selected')) {
-                savedRadius = radius * 1000;
-            } else {
-                savedRadius = radius;
+            if (lng < -180 || lng > 180) {
+                showStatus(setupStatus, 'Longitude must be between -180 and 180 degrees.', 'error');
+                return;
             }
             
-            accuracyThreshold = accuracy;
+            if (radius <= 0) {
+                showStatus(setupStatus, 'Radius must be a positive number.', 'error');
+                return;
+            }
             
-            showStatus(setupStatus, `Settings saved! Allowed radius: ${savedRadius} meters. GPS accuracy threshold: ${accuracy} meters.`, 'success');
+            savedLocation = { lat, lng };
+            savedRadius = radius;
+            
+            const unitText = radiusUnit === 'km' ? 'kilometers' : 'meters';
+            showStatus(setupStatus, `Location saved! Allowed area: ${radius} ${unitText} from (${lat.toFixed(4)}, ${lng.toFixed(4)})`, 'success');
         });
         
-        // Use current location as home
-        useCurrentLocationBtn.addEventListener('click', () => {
-            showStatus(setupStatus, 'Getting your current location to set as home...', 'info');
+        // Check current location
+        checkLocationBtn.addEventListener('click', () => {
+            if (!savedLocation || !savedRadius) {
+                showStatus(verificationStatus, 'Please set up a location and radius first.', 'error');
+                return;
+            }
             
+            showStatus(verificationStatus, 'Getting your current location...', 'info');
+            
+            // Get current position using Geolocation API
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(
                     position => {
-                        savedLocation = {
-                            lat: position.coords.latitude,
-                            lng: position.coords.longitude
-                        };
-                        
-                        homeLatDisplay.textContent = savedLocation.lat.toFixed(6);
-                        homeLngDisplay.textContent = savedLocation.lng.toFixed(6);
-                        
-                        showStatus(setupStatus, `Home location updated to your current location: (${savedLocation.lat.toFixed(6)}, ${savedLocation.lng.toFixed(6)})`, 'success');
-                    },
-                    error => {
-                        showStatus(setupStatus, `Failed to get your location: ${getGeolocationError(error)}`, 'error');
-                    },
-                    { enableHighAccuracy: true, timeout: 10000 }
-                );
-            } else {
-                showStatus(setupStatus, 'Geolocation is not supported by your browser.', 'error');
-            }
-        });
-        
-        // Start live GPS tracking
-        startTrackingBtn.addEventListener('click', () => {
-            if (isTracking) return;
-            
-            if (!savedLocation || !savedRadius) {
-                showStatus(verificationStatus, 'Please save your home location and radius first.', 'error');
-                return;
-            }
-            
-            gpsStatus.classList.add('active');
-            gpsStatusText.textContent = 'Getting high-accuracy GPS location...';
-            
-            if (navigator.geolocation) {
-                // Start watching position with high accuracy
-                watchId = navigator.geolocation.watchPosition(
-                    position => {
                         currentLocation = {
                             lat: position.coords.latitude,
-                            lng: position.coords.longitude,
-                            accuracy: position.coords.accuracy
+                            lng: position.coords.longitude
                         };
                         
                         // Update display with current coordinates
                         currentLatElement.textContent = currentLocation.lat.toFixed(6);
                         currentLngElement.textContent = currentLocation.lng.toFixed(6);
-                        currentAccuracyElement.textContent = currentLocation.accuracy.toFixed(1);
-                        displayLatElement.textContent = currentLocation.lat.toFixed(6);
-                        displayLngElement.textContent = currentLocation.lng.toFixed(6);
-                        
-                        // Update accuracy bar (inverse - lower accuracy number is better)
-                        let accuracyPercent = Math.min(100, (currentLocation.accuracy / 100) * 100);
-                        accuracyBar.style.width = `${accuracyPercent}%`;
-                        
-                        // Update GPS status
-                        if (currentLocation.accuracy <= accuracyThreshold) {
-                            gpsStatusText.textContent = `GPS Active - Good Accuracy: ${currentLocation.accuracy.toFixed(1)}m`;
-                            gpsStatus.style.background = '#e8f6ef';
-                        } else {
-                            gpsStatusText.textContent = `GPS Active - Poor Accuracy: ${currentLocation.accuracy.toFixed(1)}m (needs improvement)`;
-                            gpsStatus.style.background = '#fdebd0';
-                        }
                         
                         // Calculate distance
                         const distance = calculateDistance(
                             savedLocation.lat, savedLocation.lng,
-                            currentLocation.lat, currentLocation.lng
+                            currentLocation.lat, currentLocation.lng,
+                            radiusUnit
                         );
                         
                         // Display distance
-                        distanceElement.textContent = distance.toFixed(2);
+                        const unitText = radiusUnit === 'km' ? 'km' : 'm';
+                        distanceElement.textContent = `${distance.toFixed(2)} ${unitText}`;
                         
                         // Check if within radius
-                        if (distance <= savedRadius) {
-                            distanceMessage.innerHTML = `<span style="color:green;">✅ You are WITHIN the allowed area!</span>`;
-                            if (!qrContainer.style.display || qrContainer.style.display === 'none') {
-                                generateQRCode();
-                            }
-                        } else {
-                            distanceMessage.innerHTML = `<span style="color:red;">❌ You are OUTSIDE the allowed area</span>`;
-                            qrContainer.style.display = 'none';
-                        }
+                        const radiusInMeters = radiusUnit === 'km' ? savedRadius * 1000 : savedRadius;
+                        const distanceInMeters = radiusUnit === 'km' ? distance * 1000 : distance;
                         
-                        // Update verification status
-                        if (currentLocation.accuracy <= accuracyThreshold) {
-                            if (distance <= savedRadius) {
-                                showStatus(verificationStatus, `✅ You are at the correct location! Distance: ${distance.toFixed(2)}m`, 'success');
-                            } else {
-                                showStatus(verificationStatus, `❌ You are ${distance.toFixed(2)}m away from home (outside allowed radius)`, 'error');
-                            }
+                        if (distanceInMeters <= radiusInMeters) {
+                            showStatus(verificationStatus, 'Success! You are within the allowed radius. QR code generated.', 'success');
+                            generateQRCode();
                         } else {
-                            showStatus(verificationStatus, `⚠️ GPS accuracy is low (${currentLocation.accuracy.toFixed(1)}m). Move to open area for better accuracy.`, 'info');
+                            showStatus(verificationStatus, `You are NOT allowed. You are ${distance.toFixed(2)} ${unitText} away from the allowed location.`, 'error');
+                            qrContainer.style.display = 'none';
                         }
                     },
                     error => {
-                        gpsStatusText.textContent = `GPS Error: ${getGeolocationError(error)}`;
-                        gpsStatus.style.background = '#fadbd8';
-                        showStatus(verificationStatus, `GPS Error: ${getGeolocationError(error)}`, 'error');
+                        let errorMessage = 'Unable to retrieve your location. ';
+                        switch(error.code) {
+                            case error.PERMISSION_DENIED:
+                                errorMessage += 'Permission denied. Please enable location access.';
+                                break;
+                            case error.POSITION_UNAVAILABLE:
+                                errorMessage += 'Location information is unavailable.';
+                                break;
+                            case error.TIMEOUT:
+                                errorMessage += 'Location request timed out.';
+                                break;
+                            default:
+                                errorMessage += 'An unknown error occurred.';
+                        }
+                        showStatus(verificationStatus, errorMessage, 'error');
                     },
-                    {
-                        enableHighAccuracy: true,
-                        maximumAge: 0,
-                        timeout: 5000
-                    }
+                    { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
                 );
-                
-                isTracking = true;
-                startTrackingBtn.disabled = true;
-                stopTrackingBtn.disabled = false;
-                showStatus(verificationStatus, 'Live GPS tracking started. Move around to see updates.', 'info');
-                
             } else {
                 showStatus(verificationStatus, 'Geolocation is not supported by your browser.', 'error');
-            }
-        });
-        
-        // Stop GPS tracking
-        stopTrackingBtn.addEventListener('click', () => {
-            if (watchId !== null) {
-                navigator.geolocation.clearWatch(watchId);
-                watchId = null;
-                isTracking = false;
-                
-                gpsStatus.classList.remove('active');
-                startTrackingBtn.disabled = false;
-                stopTrackingBtn.disabled = true;
-                
-                showStatus(verificationStatus, 'Live GPS tracking stopped.', 'info');
             }
         });
         
@@ -684,36 +488,34 @@
             qrCodeElement.innerHTML = '';
             
             // Create data for QR code
-            const verificationTime = new Date().toLocaleString();
             const qrData = {
-                verified: true,
-                timestamp: verificationTime,
-                homeLocation: savedLocation,
+                timestamp: new Date().toISOString(),
+                verifiedLocation: savedLocation,
                 currentLocation: currentLocation,
-                distance: parseFloat(distanceElement.textContent),
-                allowedRadius: savedRadius,
-                status: "ACCESS GRANTED"
+                verification: "VALID"
             };
             
-            // Create QR code display
+            const qrDataString = JSON.stringify(qrData, null, 2);
+            
+            // Generate QR code using a simple method (for demo purposes)
+            // In a real application, you would use a QR code library like qrcode.js
             qrCodeElement.innerHTML = `
-                <div style="padding: 20px; text-align: center; min-width: 250px;">
-                    <div style="font-size: 60px; color: #00b09b; margin-bottom: 10px;">
+                <div style="padding: 20px; text-align: center;">
+                    <div style="font-size: 60px; color: #1a2980; margin-bottom: 10px;">
                         <i class="fas fa-check-circle"></i>
                     </div>
-                    <h3 style="color: #00b09b; margin-bottom: 10px;">ACCESS GRANTED</h3>
+                    <h3 style="color: #1a2980; margin-bottom: 10px;">Location Verified</h3>
                     <p style="color: #555; font-size: 14px; margin-bottom: 10px;">
-                        <strong>Location Verified</strong><br>
-                        ${verificationTime}
+                        <strong>Allowed Area:</strong><br>
+                        ${savedRadius} ${radiusUnit === 'km' ? 'km' : 'm'} from<br>
+                        (${savedLocation.lat.toFixed(6)}, ${savedLocation.lng.toFixed(6)})
                     </p>
-                    <div style="background: #e8f6ef; padding: 10px; border-radius: 5px; margin: 10px 0;">
-                        <div style="font-size: 12px;">
-                            <div>Distance: <strong>${parseFloat(distanceElement.textContent).toFixed(2)}m</strong></div>
-                            <div>Allowed Radius: <strong>${savedRadius}m</strong></div>
-                        </div>
-                    </div>
-                    <div style="font-family: monospace; font-size: 10px; color: #666; margin-top: 15px; word-break: break-all;">
-                        VERIFIED:${Date.now()}:${savedLocation.lat.toFixed(6)}:${savedLocation.lng.toFixed(6)}
+                    <p style="color: #555; font-size: 14px;">
+                        <strong>Your Location:</strong><br>
+                        (${currentLocation.lat.toFixed(6)}, ${currentLocation.lng.toFixed(6)})
+                    </p>
+                    <div style="margin-top: 15px; padding: 10px; background: #f0f8ff; border-radius: 5px; font-family: monospace; font-size: 12px;">
+                        ${qrDataString.substring(0, 50)}...
                     </div>
                 </div>
             `;
@@ -722,56 +524,45 @@
             qrContainer.style.display = 'block';
         }
         
-        // Download QR code
+        // Download QR code button
         downloadQRBtn.addEventListener('click', () => {
-            // Create a canvas for QR code download
+            // Create a canvas to "download" the QR (simulated for this demo)
             const canvas = document.createElement('canvas');
             const ctx = canvas.getContext('2d');
-            canvas.width = 400;
-            canvas.height = 500;
+            canvas.width = 300;
+            canvas.height = 400;
             
             // Fill background
             ctx.fillStyle = 'white';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
             
-            // Draw header
-            ctx.fillStyle = '#00b09b';
-            ctx.fillRect(0, 0, canvas.width, 80);
+            // Draw QR box
+            ctx.fillStyle = '#1a2980';
+            ctx.fillRect(50, 50, 200, 200);
             
-            ctx.fillStyle = 'white';
-            ctx.font = 'bold 22px Arial';
-            ctx.textAlign = 'center';
-            ctx.fillText('ACCESS GRANTED', canvas.width/2, 45);
+            ctx.fillStyle = '#26d0ce';
+            ctx.fillRect(60, 60, 180, 180);
             
             // Draw check mark
-            ctx.fillStyle = '#00b09b';
+            ctx.fillStyle = 'white';
             ctx.font = '60px Arial';
             ctx.textAlign = 'center';
-            ctx.fillText('✓', canvas.width/2, 180);
+            ctx.fillText('✓', 150, 140);
             
-            // Draw QR code box (simulated)
-            ctx.fillStyle = '#333';
-            ctx.fillRect(canvas.width/2 - 100, 220, 200, 200);
-            
-            ctx.fillStyle = '#e8f6ef';
-            ctx.fillRect(canvas.width/2 - 90, 230, 180, 180);
-            
-            ctx.fillStyle = '#00b09b';
-            ctx.font = '40px Arial';
-            ctx.fillText('✓', canvas.width/2, 320);
-            
-            // Draw info
-            ctx.fillStyle = '#333';
+            // Draw text
+            ctx.fillStyle = '#1a2980';
             ctx.font = 'bold 16px Arial';
-            ctx.fillText('LOCATION VERIFIED', canvas.width/2, 450);
+            ctx.fillText('LOCATION VERIFIED', 150, 200);
             
-            ctx.font = '14px Arial';
-            ctx.fillText(`Distance: ${parseFloat(distanceElement.textContent).toFixed(2)}m`, canvas.width/2, 475);
-            ctx.fillText(`Time: ${new Date().toLocaleTimeString()}`, canvas.width/2, 495);
+            ctx.fillStyle = '#333';
+            ctx.font = '12px Arial';
+            ctx.fillText(`Lat: ${currentLocation.lat.toFixed(4)}`, 150, 230);
+            ctx.fillText(`Lng: ${currentLocation.lng.toFixed(4)}`, 150, 250);
+            ctx.fillText(new Date().toLocaleString(), 150, 270);
             
             // Convert to image and trigger download
             const link = document.createElement('a');
-            link.download = 'location-access-qr.png';
+            link.download = 'location-qr-code.png';
             link.href = canvas.toDataURL('image/png');
             link.click();
             
@@ -785,59 +576,42 @@
             element.className = `status-message ${type}`;
             element.style.display = 'block';
             
-            // Auto-hide info messages after 5 seconds
-            if (type === 'info') {
+            // Auto-hide success messages after 5 seconds
+            if (type === 'success') {
                 setTimeout(() => {
                     element.style.display = 'none';
                 }, 5000);
             }
         }
         
-        // Helper function to calculate distance between two coordinates in meters
-        function calculateDistance(lat1, lon1, lat2, lon2) {
-            const R = 6371e3; // Earth's radius in meters
-            const φ1 = lat1 * Math.PI / 180;
-            const φ2 = lat2 * Math.PI / 180;
-            const Δφ = (lat2 - lat1) * Math.PI / 180;
-            const Δλ = (lon2 - lon1) * Math.PI / 180;
+        // Helper function to calculate distance between two coordinates
+        // Using Haversine formula
+        function calculateDistance(lat1, lon1, lat2, lon2, unit) {
+            const R = 6371; // Earth's radius in kilometers
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLon = (lon2 - lon1) * Math.PI / 180;
             
-            const a = Math.sin(Δφ/2) * Math.sin(Δφ/2) +
-                    Math.cos(φ1) * Math.cos(φ2) *
-                    Math.sin(Δλ/2) * Math.sin(Δλ/2);
+            const a = 
+                Math.sin(dLat/2) * Math.sin(dLat/2) +
+                Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
+                Math.sin(dLon/2) * Math.sin(dLon/2);
+            
             const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+            let distance = R * c; // Distance in kilometers
             
-            return R * c; // Distance in meters
-        }
-        
-        // Helper function to get geolocation error message
-        function getGeolocationError(error) {
-            switch(error.code) {
-                case error.PERMISSION_DENIED:
-                    return "Permission denied. Please enable location access in your browser settings.";
-                case error.POSITION_UNAVAILABLE:
-                    return "Location information unavailable. Make sure GPS is enabled on your device.";
-                case error.TIMEOUT:
-                    return "Location request timed out. Try moving to an open area.";
-                default:
-                    return "An unknown error occurred.";
+            // Convert to meters if needed
+            if (unit === 'meters') {
+                distance = distance * 1000;
             }
+            
+            return distance;
         }
         
-        // Initialize
+        // Set some default values for demo
         window.addEventListener('DOMContentLoaded', () => {
-            // Set default values
-            homeLatDisplay.textContent = savedLocation.lat.toFixed(6);
-            homeLngDisplay.textContent = savedLocation.lng.toFixed(6);
-            radiusInput.value = savedRadius;
-            accuracyThresholdInput.value = accuracyThreshold;
-            
-            // Disable stop button initially
-            stopTrackingBtn.disabled = true;
-            
-            // Show instructions
-            setTimeout(() => {
-                showStatus(setupStatus, 'Set your home location and radius, then click "Start Live GPS Tracking"', 'info');
-            }, 1000);
+            latitudeInput.value = "28.6139";
+            longitudeInput.value = "77.2090";
+            radiusInput.value = "5";
         });
     </script>
 </body>
