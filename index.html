@@ -3,160 +3,93 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>GPS Radius Checker</title>
+<title>Ultra Fast GPS</title>
 
 <style>
 body{
-    font-family:Arial, sans-serif;
-    background:#020617;
+    font-family:Arial;
+    background:#0f172a;
     color:white;
     display:flex;
     justify-content:center;
     align-items:center;
     height:100vh;
 }
-.container{
-    width:340px;
-}
 .box{
     background:#020617;
-    padding:15px;
+    padding:20px;
     border-radius:10px;
-    margin-bottom:15px;
-    box-shadow:0 0 12px #22c55e;
-}
-input, select{
-    width:100%;
-    padding:8px;
-    margin:6px 0;
-    border-radius:5px;
-    border:none;
+    width:300px;
+    text-align:center;
+    box-shadow:0 0 15px #38bdf8;
 }
 button{
-    width:100%;
     background:#22c55e;
     border:none;
-    padding:10px;
-    font-size:15px;
+    padding:10px 18px;
+    font-size:16px;
     border-radius:6px;
     font-weight:bold;
     cursor:pointer;
 }
-.result{
-    font-weight:bold;
-    text-align:center;
-}
-.success{ color:#22c55e; }
-.fail{ color:#ef4444; }
+p{margin:6px 0;}
 </style>
 </head>
 
 <body>
 
-<div class="container">
+<div class="box">
+    <h3>⚡ Ultra Fast GPS</h3>
+    <button onclick="getFastGPS()">Get Location</button>
 
-    <!-- BOX 1 : MANUAL INPUT -->
-    <div class="box">
-        <h3>📍 Manual Location</h3>
-        <input id="mLat" type="number" placeholder="Latitude">
-        <input id="mLon" type="number" placeholder="Longitude">
-        <input id="radius" type="number" placeholder="Radius">
-
-        <select id="unit">
-            <option value="m">Meter</option>
-            <option value="km">Kilometer</option>
-        </select>
-
-        <button onclick="checkRadius()">Check Radius</button>
-    </div>
-
-    <!-- BOX 2 : GPS -->
-    <div class="box">
-        <h3>⚡ Real GPS</h3>
-        <button onclick="getGPS()">Get GPS Location</button>
-        <p id="gpsStatus"></p>
-        <p id="gpsLat"></p>
-        <p id="gpsLon"></p>
-    </div>
-
-    <!-- BOX 3 : RESULT -->
-    <div class="box">
-        <h3>✅ Result</h3>
-        <p id="result" class="result">Waiting...</p>
-    </div>
-
+    <p id="status"></p>
+    <p id="lat"></p>
+    <p id="lon"></p>
 </div>
 
 <script>
-let userLat = null;
-let userLon = null;
-
-// ULTRA FAST GPS
-function getGPS(){
-    document.getElementById("gpsStatus").innerText = "Fetching...";
-    navigator.geolocation.getCurrentPosition(
-        pos=>{
-            userLat = pos.coords.latitude;
-            userLon = pos.coords.longitude;
-
-            document.getElementById("gpsStatus").innerText = "Done";
-            document.getElementById("gpsLat").innerText = "Lat: " + userLat;
-            document.getElementById("gpsLon").innerText = "Lon: " + userLon;
-        },
-        ()=>{
-            document.getElementById("gpsStatus").innerText = "GPS Error";
-        },
-        {
-            enableHighAccuracy:false,
-            timeout:2000,
-            maximumAge:600000
-        }
-    );
+function show(lat, lon, note=""){
+    document.getElementById("lat").innerText = "Latitude: " + lat;
+    document.getElementById("lon").innerText = "Longitude: " + lon;
+    document.getElementById("status").innerText = note;
 }
 
-// DISTANCE FORMULA (Haversine)
-function distance(lat1, lon1, lat2, lon2){
-    const R = 6371000; // meters
-    const dLat = (lat2-lat1) * Math.PI/180;
-    const dLon = (lon2-lon1) * Math.PI/180;
-
-    const a =
-      Math.sin(dLat/2)*Math.sin(dLat/2) +
-      Math.cos(lat1*Math.PI/180) *
-      Math.cos(lat2*Math.PI/180) *
-      Math.sin(dLon/2)*Math.sin(dLon/2);
-
-    return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)));
-}
-
-// CHECK RADIUS
-function checkRadius(){
-    if(userLat === null){
-        alert("Pehle GPS lo");
+function getFastGPS(){
+    if(!navigator.geolocation){
+        document.getElementById("status").innerText = "GPS not supported";
         return;
     }
 
-    const mLat = parseFloat(document.getElementById("mLat").value);
-    const mLon = parseFloat(document.getElementById("mLon").value);
-    let radius = parseFloat(document.getElementById("radius").value);
-    const unit = document.getElementById("unit").value;
+    document.getElementById("status").innerText = "⚡ Fetching fast location...";
 
-    if(unit === "km") radius = radius * 1000;
+    // 1️⃣ FAST (cached / network)
+    navigator.geolocation.getCurrentPosition(
+        (pos)=>{
+            show(
+                pos.coords.latitude,
+                pos.coords.longitude,
+                "⚡ Fast location (approx)"
+            );
+        },
+        ()=>{},
+        { enableHighAccuracy:false, maximumAge:600000, timeout:1000 }
+    );
 
-    const dist = distance(mLat, mLon, userLat, userLon);
-    const result = document.getElementById("result");
-
-    if(dist <= radius){
-        result.innerText = "✅ SUCCESS : Radius ke andar hai";
-        result.className = "result success";
-    }else{
-        let d = dist;
-        if(unit === "km") d = (d/1000).toFixed(2) + " km";
-        else d = Math.round(d) + " meter";
-
-        result.innerText = "❌ Bahar hai, distance: " + d;
-        result.className = "result fail";
-    }
+    // 2️⃣ ACCURATE (GPS)
+    navigator.geolocation.getCurrentPosition(
+        (pos)=>{
+            show(
+                pos.coords.latitude,
+                pos.coords.longitude,
+                "✅ Accurate GPS location"
+            );
+        },
+        ()=>{
+            document.getElementById("status").innerText =
+            "❌ Location blocked";
+        },
+        { enableHighAccuracy:true, timeout:4000 }
+    );
 }
 </script>
 
