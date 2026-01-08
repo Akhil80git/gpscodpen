@@ -1,6 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GPS Radius Checker</title>
+
+<style>
+body{
+    font-family:Arial, sans-serif;
+    background:#020617;
+    color:white;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    height:100vh;
+}
+.container{
+    width:340px;
+}
+.box{
+    background:#020617;
+    padding:15px;
+    border-radius:10px;
+    margin-bottom:15px;
+    box-shadow:0 0 12px #22c55e;
+}
+input, select{
+    width:100%;
+    padding:8px;
+    margin:6px 0;
+    border-radius:5px;
+    border:none;
+}
+button{
+    width:100%;
+    background:#22c55e;
+    border:none;
+    padding:10px;
+    font-size:15px;
+    border-radius:6px;
+    font-weight:bold;
+    cursor:pointer;
+}
+.result{
+    font-weight:bold;
+    text-align:center;
+}
+.success{ color:#22c55e; }
+.fail{ color:#ef4444; }
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <!-- BOX 1 : MANUAL INPUT -->
+    <div class="box">
+        <h3>📍 Manual Location</h3>
+        <input id="mLat" type="number" placeholder="Latitude">
+        <input id="mLon" type="number" placeholder="Longitude">
+        <input id="radius" type="number" placeholder="Radius">
+
+        <select id="unit">
+            <option value="m">Meter</option>
+            <option value="km">Kilometer</option>
+        </select>
+
+        <button onclick="checkRadius()">Check Radius</button>
+    </div>
+
+    <!-- BOX 2 : GPS -->
+    <div class="box">
+        <h3>⚡ Real GPS</h3>
+        <button onclick="getGPS()">Get GPS Location</button>
+        <p id="gpsStatus"></p>
+        <p id="gpsLat"></p>
+        <p id="gpsLon"></p>
+    </div>
+
+    <!-- BOX 3 : RESULT -->
+    <div class="box">
+        <h3>✅ Result</h3>
+        <p id="result" class="result">Waiting...</p>
+    </div>
+
+</div>
+
+<script>
+let userLat = null;
+let userLon = null;
+
+// ULTRA FAST GPS
 function getGPS(){
     document.getElementById("gpsStatus").innerText = "Fetching...";
-
     navigator.geolocation.getCurrentPosition(
         pos=>{
             userLat = pos.coords.latitude;
@@ -9,9 +102,6 @@ function getGPS(){
             document.getElementById("gpsStatus").innerText = "Done";
             document.getElementById("gpsLat").innerText = "Lat: " + userLat;
             document.getElementById("gpsLon").innerText = "Lon: " + userLon;
-
-            // 🔥 IMPORTANT LINE
-            checkRadius();   // <-- HAR BAAR CHECK HOGA
         },
         ()=>{
             document.getElementById("gpsStatus").innerText = "GPS Error";
@@ -19,7 +109,56 @@ function getGPS(){
         {
             enableHighAccuracy:false,
             timeout:2000,
-            maximumAge:0   // 🔥 cache hata diya
+            maximumAge:600000
         }
     );
 }
+
+// DISTANCE FORMULA (Haversine)
+function distance(lat1, lon1, lat2, lon2){
+    const R = 6371000; // meters
+    const dLat = (lat2-lat1) * Math.PI/180;
+    const dLon = (lon2-lon1) * Math.PI/180;
+
+    const a =
+      Math.sin(dLat/2)*Math.sin(dLat/2) +
+      Math.cos(lat1*Math.PI/180) *
+      Math.cos(lat2*Math.PI/180) *
+      Math.sin(dLon/2)*Math.sin(dLon/2);
+
+    return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)));
+}
+
+// CHECK RADIUS
+function checkRadius(){
+    if(userLat === null){
+        alert("Pehle GPS lo");
+        return;
+    }
+
+    const mLat = parseFloat(document.getElementById("mLat").value);
+    const mLon = parseFloat(document.getElementById("mLon").value);
+    let radius = parseFloat(document.getElementById("radius").value);
+    const unit = document.getElementById("unit").value;
+
+    if(unit === "km") radius = radius * 1000;
+
+    const dist = distance(mLat, mLon, userLat, userLon);
+    const result = document.getElementById("result");
+
+    if(dist <= radius){
+        result.innerText = "✅ SUCCESS : Radius ke andar hai";
+        result.className = "result success";
+    }else{
+        let d = dist;
+        if(unit === "km") d = (d/1000).toFixed(2) + " km";
+        else d = Math.round(d) + " meter";
+
+        result.innerText = "❌ Bahar hai, distance: " + d;
+        result.className = "result fail";
+    }
+}
+</script>
+
+</body>
+</html>
