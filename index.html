@@ -1,97 +1,1802 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ultra Fast GPS</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>📱 Smart Attendance System</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
 
-<style>
-body{
-    font-family:Arial;
-    background:#0f172a;
-    color:white;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    height:100vh;
-}
-.box{
-    background:#020617;
-    padding:20px;
-    border-radius:10px;
-    width:300px;
-    text-align:center;
-    box-shadow:0 0 15px #38bdf8;
-}
-button{
-    background:#22c55e;
-    border:none;
-    padding:10px 18px;
-    font-size:16px;
-    border-radius:6px;
-    font-weight:bold;
-    cursor:pointer;
-}
-p{margin:6px 0;}
-</style>
+        :root {
+            --primary: #4f46e5;
+            --primary-dark: #4338ca;
+            --secondary: #7c3aed;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --info: #0ea5e9;
+            --light: #f8fafc;
+            --dark: #1e293b;
+            --gray: #64748b;
+            --light-gray: #e2e8f0;
+            --border-radius: 12px;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+            --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.1);
+            --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        body {
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            color: var(--dark);
+            min-height: 100vh;
+            padding: 0;
+            overflow-x: hidden;
+        }
+
+        /* Prevent text selection on buttons */
+        .no-select {
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        /* Container */
+        .container {
+            max-width: 100%;
+            margin: 0 auto;
+            padding: 10px;
+        }
+
+        @media (min-width: 768px) {
+            .container {
+                max-width: 800px;
+                padding: 20px;
+            }
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            padding: 16px;
+            border-radius: var(--border-radius);
+            margin-bottom: 16px;
+            box-shadow: var(--shadow-lg);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px);
+            background-size: 30px 30px;
+            opacity: 0.3;
+            animation: float 20s linear infinite;
+        }
+
+        @keyframes float {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(30px, 30px); }
+        }
+
+        .header-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .header h1 {
+            font-size: 1.3rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 700;
+        }
+
+        .header h1 i {
+            font-size: 1.5rem;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .btn-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            border: none;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition);
+            position: relative;
+            z-index: 2;
+        }
+
+        .btn-icon:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        /* Cards */
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            margin-bottom: 16px;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .card:hover {
+            box-shadow: var(--shadow-lg);
+        }
+
+        .card-title {
+            color: var(--primary);
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid var(--light-gray);
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 700;
+        }
+
+        /* Forms */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--dark);
+            font-size: 0.95rem;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid var(--light-gray);
+            border-radius: 10px;
+            font-size: 16px;
+            transition: var(--transition);
+            background: white;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 15px 24px;
+            border: none;
+            border-radius: 10px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            font-size: 1rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 5px;
+            height: 5px;
+            background: rgba(255, 255, 255, 0.5);
+            opacity: 0;
+            border-radius: 100%;
+            transform: scale(1, 1) translate(-50%);
+            transform-origin: 50% 50%;
+        }
+
+        .btn:focus:not(:active)::after {
+            animation: ripple 1s ease-out;
+        }
+
+        @keyframes ripple {
+            0% {
+                transform: scale(0, 0);
+                opacity: 0.5;
+            }
+            100% {
+                transform: scale(20, 20);
+                opacity: 0;
+            }
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(79, 70, 229, 0.2);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, var(--success) 0%, #0da271 100%);
+            color: white;
+        }
+
+        .btn-success:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(16, 185, 129, 0.2);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, var(--danger) 0%, #dc2626 100%);
+            color: white;
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, var(--warning) 0%, #d97706 100%);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, var(--gray) 0%, #475569 100%);
+            color: white;
+        }
+
+        .btn-small {
+            padding: 10px 16px;
+            font-size: 0.9rem;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* Calendar Styles - REAL CALENDAR */
+        .calendar-container {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 20px;
+            margin-top: 20px;
+            box-shadow: var(--shadow);
+        }
+
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--light-gray);
+        }
+
+        .calendar-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--dark);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .calendar-nav {
+            display: flex;
+            gap: 10px;
+        }
+
+        .nav-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: none;
+            background: var(--light-gray);
+            color: var(--dark);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition);
+            font-weight: 700;
+        }
+
+        .nav-btn:hover {
+            background: var(--primary);
+            color: white;
+            transform: scale(1.1);
+        }
+
+        /* Week Days Header */
+        .week-days {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 8px;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .week-day {
+            font-weight: 700;
+            color: var(--gray);
+            font-size: 0.9rem;
+            padding: 8px 0;
+        }
+
+        .week-day.sun {
+            color: var(--danger);
+        }
+
+        /* Calendar Grid */
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 6px;
+        }
+
+        .calendar-day {
+            aspect-ratio: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            background: white;
+            border: 2px solid transparent;
+            position: relative;
+            padding: 5px;
+        }
+
+        .calendar-day:hover:not(.empty):not(.disabled):not(.today) {
+            background: var(--light-gray);
+            transform: translateY(-2px);
+        }
+
+        .calendar-day.today {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            border-color: var(--primary);
+            animation: pulseToday 2s infinite;
+        }
+
+        @keyframes pulseToday {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(79, 70, 229, 0.7); }
+            50% { box-shadow: 0 0 0 6px rgba(79, 70, 229, 0); }
+        }
+
+        /* Status Indicators */
+        .calendar-day.present {
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--success);
+            border-color: var(--success);
+        }
+
+        .calendar-day.absent {
+            background: rgba(239, 68, 68, 0.15);
+            color: var(--danger);
+            border-color: var(--danger);
+        }
+
+        .calendar-day.application {
+            background: rgba(245, 158, 11, 0.15);
+            color: var(--warning);
+            border-color: var(--warning);
+        }
+
+        /* Disabled days (Sundays, past months, etc) */
+        .calendar-day.empty {
+            background: transparent;
+            cursor: default;
+            visibility: hidden;
+        }
+
+        .calendar-day.disabled {
+            background: #f1f5f9;
+            color: #cbd5e1;
+            cursor: not-allowed;
+            opacity: 0.5;
+            border: 2px dashed #e2e8f0;
+        }
+
+        .calendar-day.disabled:hover {
+            background: #f1f5f9;
+            transform: none;
+        }
+
+        /* Day status icon */
+        .day-status {
+            position: absolute;
+            bottom: 4px;
+            font-size: 0.7rem;
+        }
+
+        .day-number {
+            font-size: 1.1rem;
+            font-weight: 700;
+        }
+
+        /* Attendance Table - Mobile Optimized */
+        .attendance-table-container {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            margin: 20px 0;
+            border-radius: 10px;
+            background: white;
+            box-shadow: var(--shadow);
+        }
+
+        .attendance-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 500px;
+        }
+
+        .attendance-table th {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            font-weight: 700;
+            padding: 16px 12px;
+            text-align: center;
+            position: sticky;
+            left: 0;
+            font-size: 0.9rem;
+        }
+
+        .attendance-table td {
+            padding: 14px 10px;
+            border-bottom: 1px solid var(--light-gray);
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        .attendance-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .attendance-table tr:hover {
+            background-color: rgba(79, 70, 229, 0.03);
+        }
+
+        /* Student Name Column */
+        .student-name {
+            font-weight: 700;
+            color: var(--dark);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 140px;
+            text-align: left;
+            padding-left: 15px;
+            position: sticky;
+            left: 0;
+            background: white;
+            z-index: 5;
+        }
+
+        /* Status buttons in table */
+        .status-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            border: 2px solid transparent;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 1.2rem;
+            margin: 0 4px;
+        }
+
+        .status-btn:hover {
+            transform: scale(1.15);
+        }
+
+        .status-btn.active {
+            border-color: var(--dark);
+            transform: scale(1.1);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .present-btn {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(16, 185, 129, 0.25) 100%);
+            color: var(--success);
+        }
+
+        .present-btn.active {
+            background: linear-gradient(135deg, var(--success) 0%, #0da271 100%);
+            color: white;
+        }
+
+        .absent-btn {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.15) 0%, rgba(239, 68, 68, 0.25) 100%);
+            color: var(--danger);
+        }
+
+        .absent-btn.active {
+            background: linear-gradient(135deg, var(--danger) 0%, #dc2626 100%);
+            color: white;
+        }
+
+        .app-btn {
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.15) 0%, rgba(245, 158, 11, 0.25) 100%);
+            color: var(--warning);
+        }
+
+        .app-btn.active {
+            background: linear-gradient(135deg, var(--warning) 0%, #d97706 100%);
+            color: white;
+        }
+
+        /* Quick Actions */
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin: 20px 0;
+        }
+
+        @media (min-width: 480px) {
+            .quick-actions {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+
+        .quick-action-btn {
+            padding: 14px;
+            border-radius: 10px;
+            border: 2px solid var(--light-gray);
+            background: white;
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+            min-height: 90px;
+            justify-content: center;
+        }
+
+        .quick-action-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow);
+        }
+
+        .quick-action-btn.active {
+            border-color: var(--primary);
+            background: rgba(79, 70, 229, 0.05);
+            transform: translateY(-3px);
+            box-shadow: var(--shadow);
+        }
+
+        .quick-action-btn i {
+            font-size: 1.5rem;
+        }
+
+        .btn-present {
+            color: var(--success);
+            border-color: rgba(16, 185, 129, 0.3);
+        }
+
+        .btn-absent {
+            color: var(--danger);
+            border-color: rgba(239, 68, 68, 0.3);
+        }
+
+        .btn-app {
+            color: var(--warning);
+            border-color: rgba(245, 158, 11, 0.3);
+        }
+
+        .btn-mark-all {
+            color: var(--danger);
+            border-color: rgba(239, 68, 68, 0.3);
+            grid-column: span 2;
+        }
+
+        @media (min-width: 480px) {
+            .btn-mark-all {
+                grid-column: span 1;
+            }
+        }
+
+        /* Results Table */
+        .results-container {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            margin: 20px 0;
+            border-radius: 10px;
+            background: white;
+            box-shadow: var(--shadow);
+        }
+
+        .results-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 500px;
+        }
+
+        .results-table th {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            font-weight: 700;
+            padding: 14px 10px;
+            text-align: center;
+            font-size: 0.85rem;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .results-table td {
+            padding: 12px 8px;
+            border-bottom: 1px solid var(--light-gray);
+            text-align: center;
+            font-size: 0.9rem;
+        }
+
+        .results-table .highlight {
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        /* Status badges */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 30px;
+            height: 30px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 0.85rem;
+        }
+
+        .badge-present {
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--success);
+        }
+
+        .badge-absent {
+            background: rgba(239, 68, 68, 0.15);
+            color: var(--danger);
+        }
+
+        .badge-app {
+            background: rgba(245, 158, 11, 0.15);
+            color: var(--warning);
+        }
+
+        .points-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            min-width: 60px;
+        }
+
+        .points-positive {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(16, 185, 129, 0.25) 100%);
+            color: var(--success);
+        }
+
+        .points-negative {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.15) 0%, rgba(239, 68, 68, 0.25) 100%);
+            color: var(--danger);
+        }
+
+        .bonus-badge {
+            background: linear-gradient(135deg, rgba(124, 58, 237, 0.15) 0%, rgba(124, 58, 237, 0.25) 100%);
+            color: var(--secondary);
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            border-bottom: 2px solid var(--light-gray);
+            margin-bottom: 20px;
+            background: white;
+            border-radius: 10px 10px 0 0;
+            overflow: hidden;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 16px;
+            text-align: center;
+            cursor: pointer;
+            font-weight: 700;
+            transition: var(--transition);
+            font-size: 0.95rem;
+            position: relative;
+        }
+
+        .tab.active {
+            color: var(--primary);
+        }
+
+        .tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            border-radius: 3px 3px 0 0;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            color: var(--gray);
+            font-size: 0.85rem;
+            padding-top: 20px;
+            border-top: 1px solid var(--light-gray);
+        }
+
+        /* Notification */
+        .notification {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            padding: 16px 24px;
+            border-radius: 12px;
+            color: white;
+            font-weight: 700;
+            box-shadow: var(--shadow-lg);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            opacity: 0;
+            transition: var(--transition);
+            max-width: 90%;
+            backdrop-filter: blur(10px);
+            min-width: 280px;
+        }
+
+        .notification.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
+        .notification.success {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.9) 0%, rgba(13, 162, 113, 0.9) 100%);
+            border-left: 5px solid var(--success);
+        }
+
+        .notification.error {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.9) 0%, rgba(220, 38, 38, 0.9) 100%);
+            border-left: 5px solid var(--danger);
+        }
+
+        .notification.warning {
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.9) 0%, rgba(217, 119, 6, 0.9) 100%);
+            border-left: 5px solid var(--warning);
+        }
+
+        .notification.info {
+            background: linear-gradient(135deg, rgba(79, 70, 229, 0.9) 0%, rgba(67, 56, 202, 0.9) 100%);
+            border-left: 5px solid var(--primary);
+        }
+
+        /* Loading Spinner */
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(79, 70, 229, 0.1);
+            border-left-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--gray);
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            color: var(--light-gray);
+        }
+
+        .empty-state h3 {
+            margin-bottom: 10px;
+            color: var(--dark);
+            font-size: 1.3rem;
+        }
+
+        /* Responsive Adjustments */
+        @media (max-width: 360px) {
+            .header h1 {
+                font-size: 1.1rem;
+            }
+            
+            .calendar-title {
+                font-size: 1.1rem;
+            }
+            
+            .status-btn {
+                width: 36px;
+                height: 36px;
+                font-size: 1.1rem;
+            }
+            
+            .quick-action-btn {
+                min-height: 80px;
+                padding: 12px;
+            }
+        }
+
+        @media (min-width: 768px) {
+            .calendar-day {
+                font-size: 1rem;
+            }
+            
+            .student-name {
+                max-width: 180px;
+            }
+            
+            .quick-actions {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 15px;
+            }
+        }
+
+        /* Print Styles */
+        @media print {
+            .header, .btn-icon, .quick-actions, .notification, .footer {
+                display: none !important;
+            }
+            
+            .card {
+                box-shadow: none !important;
+                border: 1px solid #ddd !important;
+            }
+        }
+    </style>
 </head>
-
 <body>
+    <div class="container no-select">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-content">
+                <h1><i class="fas fa-user-check"></i> Smart Attendance System</h1>
+                <p style="font-size: 0.9rem; opacity: 0.9; margin-top: 5px;">Complete mobile solution for schools</p>
+            </div>
+            <button class="btn-icon" id="homeBtn" onclick="goHome()" title="Go Home">
+                <i class="fas fa-home"></i>
+            </button>
+        </div>
 
-<div class="box">
-    <h3>⚡ Ultra Fast GPS</h3>
-    <button onclick="getFastGPS()">Get Location</button>
+        <!-- Notification -->
+        <div id="notification" class="notification hidden">
+            <i class="fas fa-info-circle"></i>
+            <span id="notification-text">Notification message</span>
+        </div>
 
-    <p id="status"></p>
-    <p id="lat"></p>
-    <p id="lon"></p>
-</div>
+        <!-- Home Screen -->
+        <div class="card" id="homeScreen">
+            <h2 class="card-title"><i class="fas fa-sliders-h"></i> System Setup</h2>
+            <div class="form-group">
+                <label class="form-label">Select Academic Month</label>
+                <input type="month" id="monthInput" class="form-control" value="2024-01">
+                <small style="color: var(--gray); display: block; margin-top: 5px;">Select the month for attendance</small>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Select Class & Section</label>
+                <select id="classSelect" class="form-control">
+                    <option value="">-- Select Class --</option>
+                    <option value="Class 5">Class 5 (Section A)</option>
+                    <option value="Class 6">Class 6 (Section A)</option>
+                    <option value="Class 7">Class 7 (Section A)</option>
+                    <option value="Class 8">Class 8 (Section A)</option>
+                    <option value="Class 9">Class 9 (Section A)</option>
+                    <option value="Class 10">Class 10 (Section A)</option>
+                </select>
+            </div>
+            <button class="btn btn-primary" onclick="openCalendar()">
+                <i class="fas fa-calendar-alt"></i> Open Calendar View
+            </button>
+        </div>
 
-<script>
-function show(lat, lon, note=""){
-    document.getElementById("lat").innerText = "Latitude: " + lat;
-    document.getElementById("lon").innerText = "Longitude: " + lon;
-    document.getElementById("status").innerText = note;
-}
+        <!-- Calendar Screen -->
+        <div class="card hidden" id="calendarScreen">
+            <div class="calendar-header">
+                <div class="calendar-title">
+                    <i class="fas fa-calendar"></i>
+                    <span id="currentMonthDisplay">January 2024</span>
+                </div>
+                <div class="calendar-nav">
+                    <button class="nav-btn" onclick="changeMonth(-1)" title="Previous Month">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                    <button class="nav-btn" onclick="changeMonth(1)" title="Next Month">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Week Days Header -->
+            <div class="week-days">
+                <div class="week-day sun">Sun</div>
+                <div class="week-day">Mon</div>
+                <div class="week-day">Tue</div>
+                <div class="week-day">Wed</div>
+                <div class="week-day">Thu</div>
+                <div class="week-day">Fri</div>
+                <div class="week-day">Sat</div>
+            </div>
+            
+            <!-- Calendar Grid -->
+            <div class="calendar-grid" id="calendarContainer">
+                <!-- Calendar will be generated here -->
+            </div>
+            
+            <!-- Legend -->
+            <div style="margin-top: 20px; display: flex; flex-wrap: wrap; gap: 15px; justify-content: center;">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <div style="width: 20px; height: 20px; border-radius: 5px; background: var(--primary);"></div>
+                    <span style="font-size: 0.85rem; color: var(--gray);">Today</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <div style="width: 20px; height: 20px; border-radius: 5px; background: rgba(16, 185, 129, 0.15); border: 2px solid var(--success);"></div>
+                    <span style="font-size: 0.85rem; color: var(--gray);">Present</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <div style="width: 20px; height: 20px; border-radius: 5px; background: rgba(239, 68, 68, 0.15); border: 2px solid var(--danger);"></div>
+                    <span style="font-size: 0.85rem; color: var(--gray);">Absent</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <div style="width: 20px; height: 20px; border-radius: 5px; background: rgba(245, 158, 11, 0.15); border: 2px solid var(--warning);"></div>
+                    <span style="font-size: 0.85rem; color: var(--gray);">Application</span>
+                </div>
+            </div>
+            
+            <div class="quick-actions" style="margin-top: 25px;">
+                <button class="btn btn-primary" onclick="openResultScreen()">
+                    <i class="fas fa-chart-bar"></i> View Results
+                </button>
+                <button class="btn btn-secondary" onclick="goHome()">
+                    <i class="fas fa-arrow-left"></i> Back to Setup
+                </button>
+            </div>
+        </div>
 
-function getFastGPS(){
-    if(!navigator.geolocation){
-        document.getElementById("status").innerText = "GPS not supported";
-        return;
-    }
+        <!-- Attendance Screen -->
+        <div class="card hidden" id="attendanceScreen">
+            <h2 class="card-title" id="attendanceTitle">
+                <i class="fas fa-edit"></i> Mark Attendance
+            </h2>
+            
+            <!-- Quick Actions -->
+            <div class="quick-actions">
+                <button class="quick-action-btn btn-present" onclick="setMarkingMode('P')" id="presentModeBtn">
+                    <i class="fas fa-check-circle"></i>
+                    <span>Present</span>
+                </button>
+                <button class="quick-action-btn btn-absent" onclick="setMarkingMode('A')" id="absentModeBtn">
+                    <i class="fas fa-times-circle"></i>
+                    <span>Absent</span>
+                </button>
+                <button class="quick-action-btn btn-app" onclick="setMarkingMode('AP')" id="appModeBtn">
+                    <i class="fas fa-file-alt"></i>
+                    <span>Application</span>
+                </button>
+                <button class="quick-action-btn btn-mark-all" onclick="markAllUnmarkedAsAbsent()">
+                    <i class="fas fa-user-times"></i>
+                    <span>Unmarked = Absent</span>
+                </button>
+            </div>
+            
+            <!-- Student Attendance Table -->
+            <div class="attendance-table-container">
+                <table class="attendance-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 40%; text-align: left;">Student</th>
+                            <th style="width: 20%;">Present</th>
+                            <th style="width: 20%;">Absent</th>
+                            <th style="width: 20%;">App</th>
+                        </tr>
+                    </thead>
+                    <tbody id="studentTableBody">
+                        <!-- Student rows will be inserted here -->
+                    </tbody>
+                </table>
+            </div>
+            
+            <button class="btn btn-success" onclick="saveAttendance()">
+                <i class="fas fa-save"></i> Save Attendance
+            </button>
+            
+            <div class="quick-actions" style="margin-top: 20px;">
+                <button class="btn btn-secondary" onclick="backToCalendar()">
+                    <i class="fas fa-arrow-left"></i> Back to Calendar
+                </button>
+            </div>
+        </div>
 
-    document.getElementById("status").innerText = "⚡ Fetching fast location...";
+        <!-- Result Screen -->
+        <div class="card hidden" id="resultScreen">
+            <h2 class="card-title"><i class="fas fa-chart-pie"></i> Attendance Analytics</h2>
+            
+            <div class="tabs">
+                <div class="tab active" onclick="switchTab('overview')">Class Overview</div>
+                <div class="tab" onclick="switchTab('student')">Student Details</div>
+            </div>
+            
+            <div class="tab-content active" id="overviewTab">
+                <div class="results-container">
+                    <table class="results-table" id="overviewTable">
+                        <!-- Results will be inserted here -->
+                    </table>
+                </div>
+            </div>
+            
+            <div class="tab-content" id="studentTab">
+                <div class="form-group">
+                    <select id="studentSelect" class="form-control" onchange="showIndividualResult()">
+                        <option value="">-- Select Student --</option>
+                    </select>
+                </div>
+                <div id="individualResultContainer">
+                    <div class="empty-state">
+                        <i class="fas fa-user-graduate"></i>
+                        <h3>Select a Student</h3>
+                        <p>Detailed attendance report will appear here</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="quick-actions" style="margin-top: 20px;">
+                <button class="btn btn-secondary" onclick="backToCalendar()">
+                    <i class="fas fa-arrow-left"></i> Back to Calendar
+                </button>
+            </div>
+        </div>
+    </div>
 
-    // 1️⃣ FAST (cached / network)
-    navigator.geolocation.getCurrentPosition(
-        (pos)=>{
-            show(
-                pos.coords.latitude,
-                pos.coords.longitude,
-                "⚡ Fast location (approx)"
-            );
-        },
-        ()=>{},
-        { enableHighAccuracy:false, maximumAge:600000, timeout:1000 }
-    );
+    <div class="footer">
+        <p>Smart Attendance System © 2024 | Designed for Mobile & Desktop</p>
+        <p style="font-size: 0.8rem; margin-top: 5px; color: var(--gray);">
+            <i class="fas fa-mobile-alt"></i> Fully Responsive | 
+            <i class="fas fa-bolt"></i> Fast & Efficient |
+            <i class="fas fa-shield-alt"></i> Secure
+        </p>
+    </div>
 
-    // 2️⃣ ACCURATE (GPS)
-    navigator.geolocation.getCurrentPosition(
-        (pos)=>{
-            show(
-                pos.coords.latitude,
-                pos.coords.longitude,
-                "✅ Accurate GPS location"
-            );
-        },
-        ()=>{
-            document.getElementById("status").innerText =
-            "❌ Location blocked";
-        },
-        { enableHighAccuracy:true, timeout:4000 }
-    );
-}
-</script>
+    <script>
+        // Database and state
+        let DB = {};
+        let currentMonth = "";
+        let currentClass = "";
+        let currentDate = "";
+        let tempAttendance = {};
+        let markingMode = "P";
 
+        // Students database for all classes
+        const students = {
+            "Class 5": ["Aarav Sharma", "Vivaan Patel", "Aditya Singh", "Vihaan Gupta", "Reyansh Kumar", "Sai Desai", "Arjun Reddy"],
+            "Class 6": ["Ananya Mishra", "Diya Reddy", "Aaradhya Sharma", "Ishita Gupta", "Saanvi Patel", "Anika Singh", "Myra Kumar"],
+            "Class 7": ["Advait Sharma", "Kabir Patel", "Rudra Singh", "Vihaan Gupta", "Atharva Kumar", "Reyansh Desai", "Aryan Nair"],
+            "Class 8": ["Mohan Sharma", "Raju Patel", "Sohan Singh", "Priya Gupta", "Neha Kumar", "Rahul Desai", "Anjali Nair"],
+            "Class 9": ["Aman Sharma", "Ravi Patel", "Kritika Singh", "Sanjay Gupta", "Pooja Kumar", "Rahul Desai", "Meera Nair"],
+            "Class 10": ["Rohan Sharma", "Anjali Patel", "Kunal Singh", "Swati Gupta", "Rahul Kumar", "Priya Desai", "Vikas Nair"]
+        };
+
+        // Initialize with sample data
+        function initializeSampleData() {
+            const sampleMonth = "2024-01";
+            
+            if (!DB[sampleMonth]) {
+                DB[sampleMonth] = {};
+                
+                // Add sample attendance for Class 8 on Jan 15
+                const sampleDate = "2024-01-15";
+                DB[sampleMonth]["Class 8"] = {};
+                DB[sampleMonth]["Class 8"][sampleDate] = {
+                    "Mohan Sharma": "P",
+                    "Raju Patel": "A",
+                    "Sohan Singh": "AP",
+                    "Priya Gupta": "P",
+                    "Neha Kumar": "P",
+                    "Rahul Desai": "A",
+                    "Anjali Nair": "P"
+                };
+                
+                // Add sample attendance for Class 9 on Jan 16
+                const sampleDate2 = "2024-01-16";
+                DB[sampleMonth]["Class 9"] = {};
+                DB[sampleMonth]["Class 9"][sampleDate2] = {
+                    "Aman Sharma": "P",
+                    "Ravi Patel": "P",
+                    "Kritika Singh": "A",
+                    "Sanjay Gupta": "P",
+                    "Pooja Kumar": "AP",
+                    "Rahul Desai": "P",
+                    "Meera Nair": "P"
+                };
+            }
+        }
+
+        // Notification system
+        function showNotification(message, type = "info") {
+            const notification = document.getElementById("notification");
+            const notificationText = document.getElementById("notification-text");
+            
+            notificationText.textContent = message;
+            notification.className = `notification ${type} show`;
+            
+            setTimeout(() => {
+                notification.classList.remove("show");
+            }, 3000);
+        }
+
+        // Navigation functions
+        function goHome() {
+            document.querySelectorAll(".card").forEach(card => card.classList.add("hidden"));
+            document.getElementById("homeScreen").classList.remove("hidden");
+        }
+
+        function openCalendar() {
+            const monthInput = document.getElementById("monthInput");
+            const classSelect = document.getElementById("classSelect");
+            
+            if (!monthInput.value || !classSelect.value) {
+                showNotification("Please select both month and class", "error");
+                return;
+            }
+            
+            currentMonth = monthInput.value;
+            currentClass = classSelect.value;
+            
+            // Update month display
+            const date = new Date(currentMonth + "-01");
+            document.getElementById("currentMonthDisplay").textContent = 
+                date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+            
+            // Switch screens
+            document.querySelectorAll(".card").forEach(card => card.classList.add("hidden"));
+            document.getElementById("calendarScreen").classList.remove("hidden");
+            
+            drawRealCalendar();
+        }
+
+        // यहाँ Back बटन ठीक किया गया है
+        function backToCalendar() {
+            // Check if there are unsaved changes
+            if (Object.keys(tempAttendance).length > 0) {
+                if (!confirm("You have unsaved changes. Go back without saving?")) {
+                    return;
+                }
+            }
+            
+            document.querySelectorAll(".card").forEach(card => card.classList.add("hidden"));
+            document.getElementById("calendarScreen").classList.remove("hidden");
+            drawRealCalendar();
+        }
+
+        // REAL CALENDAR with disabled Sundays
+        function drawRealCalendar() {
+            const container = document.getElementById("calendarContainer");
+            container.innerHTML = "";
+            
+            const [year, month] = currentMonth.split("-");
+            const firstDay = new Date(year, month - 1, 1);
+            const lastDay = new Date(year, month, 0);
+            const daysInMonth = lastDay.getDate();
+            const firstDayOfWeek = firstDay.getDay(); // 0 = Sunday, 1 = Monday, etc.
+            
+            const today = new Date();
+            const isCurrentMonth = today.getFullYear() == year && (today.getMonth() + 1) == month;
+            
+            // Add empty cells for days before the first day of the month
+            for (let i = 0; i < firstDayOfWeek; i++) {
+                const emptyDay = document.createElement("div");
+                emptyDay.className = "calendar-day empty";
+                container.appendChild(emptyDay);
+            }
+            
+            // Add days of the month
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dayElement = document.createElement("div");
+                const dateStr = `${currentMonth}-${day.toString().padStart(2, '0')}`;
+                const dateObj = new Date(year, month - 1, day);
+                const dayOfWeek = dateObj.getDay(); // 0 = Sunday
+                
+                // Check if it's Sunday (dayOfWeek === 0)
+                const isSunday = dayOfWeek === 0;
+                const isToday = isCurrentMonth && day === today.getDate();
+                
+                dayElement.className = "calendar-day";
+                
+                // Add day number
+                const dayNumber = document.createElement("div");
+                dayNumber.className = "day-number";
+                dayNumber.textContent = day;
+                dayElement.appendChild(dayNumber);
+                
+                // Check if attendance is already marked for this date
+                const classData = DB[currentMonth]?.[currentClass] || {};
+                const attendanceData = classData[dateStr];
+                
+                if (attendanceData) {
+                    // Check what status is most common for this day
+                    const statusCount = { P: 0, A: 0, AP: 0 };
+                    Object.values(attendanceData).forEach(status => {
+                        if (statusCount[status] !== undefined) {
+                            statusCount[status]++;
+                        }
+                    });
+                    
+                    // Determine the dominant status
+                    let dominantStatus = "P";
+                    if (statusCount["A"] > statusCount[dominantStatus]) dominantStatus = "A";
+                    if (statusCount["AP"] > statusCount[dominantStatus]) dominantStatus = "AP";
+                    
+                    if (dominantStatus === "P") {
+                        dayElement.classList.add("present");
+                        const statusIcon = document.createElement("div");
+                        statusIcon.className = "day-status";
+                        statusIcon.innerHTML = '<i class="fas fa-check"></i>';
+                        dayElement.appendChild(statusIcon);
+                    } else if (dominantStatus === "A") {
+                        dayElement.classList.add("absent");
+                        const statusIcon = document.createElement("div");
+                        statusIcon.className = "day-status";
+                        statusIcon.innerHTML = '<i class="fas fa-times"></i>';
+                        dayElement.appendChild(statusIcon);
+                    } else if (dominantStatus === "AP") {
+                        dayElement.classList.add("application");
+                        const statusIcon = document.createElement("div");
+                        statusIcon.className = "day-status";
+                        statusIcon.innerHTML = '<i class="fas fa-file-alt"></i>';
+                        dayElement.appendChild(statusIcon);
+                    }
+                }
+                
+                // Mark as today
+                if (isToday) {
+                    dayElement.classList.add("today");
+                }
+                
+                // Mark Sundays as disabled (blurred, non-clickable)
+                if (isSunday) {
+                    dayElement.classList.add("disabled");
+                    dayElement.title = "Sunday - No school";
+                    dayElement.style.cursor = "not-allowed";
+                    dayElement.style.opacity = "0.5";
+                    dayElement.style.filter = "blur(0.5px)";
+                } else {
+                    // Only add click event for non-Sundays
+                    dayElement.onclick = () => openAttendance(dateStr);
+                }
+                
+                container.appendChild(dayElement);
+            }
+        }
+
+        function changeMonth(change) {
+            const [year, month] = currentMonth.split("-");
+            let newMonth = parseInt(month) + change;
+            let newYear = parseInt(year);
+            
+            if (newMonth < 1) {
+                newMonth = 12;
+                newYear--;
+            } else if (newMonth > 12) {
+                newMonth = 1;
+                newYear++;
+            }
+            
+            currentMonth = `${newYear}-${newMonth.toString().padStart(2, '0')}`;
+            document.getElementById("monthInput").value = currentMonth;
+            
+            // Update month display
+            const date = new Date(currentMonth + "-01");
+            document.getElementById("currentMonthDisplay").textContent = 
+                date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+            
+            drawRealCalendar();
+        }
+
+        // Attendance functions
+        function openAttendance(date) {
+            const classData = DB[currentMonth]?.[currentClass] || {};
+            const dateObj = new Date(date);
+            const dayOfWeek = dateObj.getDay();
+            
+            // Check if it's Sunday
+            if (dayOfWeek === 0) {
+                showNotification("Sunday - No attendance marking allowed", "warning");
+                return;
+            }
+            
+            // Check if attendance is already saved for this date
+            if (classData[date]) {
+                showNotification(`Attendance for ${date} is already marked.`, "info");
+                return;
+            }
+            
+            currentDate = date;
+            tempAttendance = {};
+            
+            // Switch to attendance screen
+            document.querySelectorAll(".card").forEach(card => card.classList.add("hidden"));
+            document.getElementById("attendanceScreen").classList.remove("hidden");
+            
+            // Update title
+            const formattedDate = dateObj.toLocaleDateString('en-US', { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            });
+            document.getElementById("attendanceTitle").innerHTML = 
+                `<i class="fas fa-edit"></i> ${currentClass} - ${formattedDate}`;
+            
+            renderStudentTable();
+            setMarkingMode("P"); // Reset to present mode
+        }
+
+        function renderStudentTable() {
+            const tableBody = document.getElementById("studentTableBody");
+            tableBody.innerHTML = "";
+            
+            students[currentClass].forEach((student) => {
+                const status = tempAttendance[student] || "";
+                
+                const row = document.createElement("tr");
+                
+                // Student name cell
+                const nameCell = document.createElement("td");
+                nameCell.className = "student-name";
+                nameCell.textContent = student;
+                
+                // Present button cell
+                const presentCell = document.createElement("td");
+                const presentBtn = document.createElement("button");
+                presentBtn.className = `status-btn present-btn ${status === 'P' ? 'active' : ''}`;
+                presentBtn.innerHTML = '<i class="fas fa-check"></i>';
+                presentBtn.onclick = () => markStudent(student, 'P');
+                presentCell.appendChild(presentBtn);
+                
+                // Absent button cell
+                const absentCell = document.createElement("td");
+                const absentBtn = document.createElement("button");
+                absentBtn.className = `status-btn absent-btn ${status === 'A' ? 'active' : ''}`;
+                absentBtn.innerHTML = '<i class="fas fa-times"></i>';
+                absentBtn.onclick = () => markStudent(student, 'A');
+                absentCell.appendChild(absentBtn);
+                
+                // Application button cell
+                const appCell = document.createElement("td");
+                const appBtn = document.createElement("button");
+                appBtn.className = `status-btn app-btn ${status === 'AP' ? 'active' : ''}`;
+                appBtn.innerHTML = '<i class="fas fa-file-alt"></i>';
+                appBtn.onclick = () => markStudent(student, 'AP');
+                appCell.appendChild(appBtn);
+                
+                // Add cells to row
+                row.appendChild(nameCell);
+                row.appendChild(presentCell);
+                row.appendChild(absentCell);
+                row.appendChild(appCell);
+                
+                tableBody.appendChild(row);
+            });
+        }
+
+        function markStudent(student, status) {
+            tempAttendance[student] = status;
+            
+            // Update active button in the mode selector
+            updateModeButtons(status);
+            
+            // Re-render the table to update the UI
+            renderStudentTable();
+            
+            // Show temporary status indicator
+            showStatusIndicator(student, status);
+        }
+
+        function showStatusIndicator(student, status) {
+            const rows = document.querySelectorAll("#studentTableBody tr");
+            rows.forEach(row => {
+                if (row.querySelector(".student-name").textContent === student) {
+                    const nameCell = row.querySelector(".student-name");
+                    
+                    // Add status emoji temporarily
+                    const statusEmoji = status === 'P' ? ' ✅' : 
+                                      status === 'A' ? ' ❌' : 
+                                      ' 📄';
+                    
+                    // Create a temporary indicator
+                    const tempIndicator = document.createElement("span");
+                    tempIndicator.style.color = status === 'P' ? 'var(--success)' : 
+                                               status === 'A' ? 'var(--danger)' : 
+                                               'var(--warning)';
+                    tempIndicator.style.marginLeft = "5px";
+                    tempIndicator.style.fontWeight = "bold";
+                    tempIndicator.textContent = statusEmoji;
+                    
+                    nameCell.appendChild(tempIndicator);
+                    
+                    // Remove after 1 second
+                    setTimeout(() => {
+                        if (tempIndicator.parentNode === nameCell) {
+                            tempIndicator.remove();
+                        }
+                    }, 1000);
+                }
+            });
+        }
+
+        function setMarkingMode(mode) {
+            markingMode = mode;
+            updateModeButtons(mode);
+            
+            const modeName = mode === "P" ? "Present" : mode === "A" ? "Absent" : "Application";
+            showNotification(`Marking mode set to: ${modeName}`, "info");
+        }
+
+        function updateModeButtons(activeMode) {
+            // Update quick action buttons
+            document.querySelectorAll(".quick-action-btn").forEach(btn => btn.classList.remove("active"));
+            
+            if (activeMode === "P") {
+                document.getElementById("presentModeBtn").classList.add("active");
+            } else if (activeMode === "A") {
+                document.getElementById("absentModeBtn").classList.add("active");
+            } else if (activeMode === "AP") {
+                document.getElementById("appModeBtn").classList.add("active");
+            }
+        }
+
+        function markAllUnmarkedAsAbsent() {
+            const unmarkedStudents = students[currentClass].filter(student => !tempAttendance[student]);
+            
+            if (unmarkedStudents.length === 0) {
+                showNotification("All students are already marked", "info");
+                return;
+            }
+            
+            if (!confirm(`Mark ${unmarkedStudents.length} unmarked students as Absent?`)) {
+                return;
+            }
+            
+            unmarkedStudents.forEach(student => {
+                tempAttendance[student] = "A";
+            });
+            
+            renderStudentTable();
+            showNotification(`${unmarkedStudents.length} students marked as Absent`, "warning");
+        }
+
+        function saveAttendance() {
+            // Check if all students are marked
+            const unmarkedCount = students[currentClass].filter(student => !tempAttendance[student]).length;
+            
+            if (unmarkedCount > 0) {
+                if (confirm(`${unmarkedCount} students are not marked. Mark them as Absent and save?`)) {
+                    students[currentClass].forEach(student => {
+                        if (!tempAttendance[student]) {
+                            tempAttendance[student] = "A";
+                        }
+                    });
+                } else {
+                    showNotification("Please mark all students before saving", "error");
+                    return;
+                }
+            }
+            
+            // Save to database
+            if (!DB[currentMonth]) DB[currentMonth] = {};
+            if (!DB[currentMonth][currentClass]) DB[currentMonth][currentClass] = {};
+            
+            DB[currentMonth][currentClass][currentDate] = {...tempAttendance};
+            
+            showNotification(`Attendance saved successfully for ${currentDate}`, "success");
+            
+            // Go back to calendar
+            backToCalendar();
+        }
+
+        // Bonus calculation logic
+        function calculateWithBonus(studentName, data) {
+            let streak = 0;
+            let bonus = 0;
+            let base = 0;
+            let sevenGiven = false;
+
+            let dates = Object.keys(data).sort();
+
+            dates.forEach(d => {
+                let st = data[d][studentName];
+
+                if (st === "P") {
+                    base += 8;
+                    streak++;
+
+                    // har 3 lagatar present par +2
+                    if (streak % 3 === 0) {
+                        bonus += 2;
+                    }
+
+                    // 7 lagatar present par extra +5 (sirf ek bar)
+                    if (streak === 7 && !sevenGiven) {
+                        bonus += 5;
+                        sevenGiven = true;
+                    }
+                } else if (st === "A") {
+                    base -= 6;
+                    streak = 0;
+                    sevenGiven = false;
+                } else if (st === "AP") {
+                    base += 1;
+                    // streak same rahega
+                }
+            });
+
+            return { points: base + bonus, bonus };
+        }
+
+        // Result functions
+        function openResultScreen() {
+            document.querySelectorAll(".card").forEach(card => card.classList.add("hidden"));
+            document.getElementById("resultScreen").classList.remove("hidden");
+            
+            buildOverviewTab();
+            buildStudentDropdown();
+        }
+
+        function switchTab(tabName) {
+            // Update active tab
+            document.querySelectorAll(".tab").forEach(tab => tab.classList.remove("active"));
+            document.querySelectorAll(".tab-content").forEach(content => content.classList.remove("active"));
+            
+            if (tabName === "overview") {
+                document.querySelector(".tab:nth-child(1)").classList.add("active");
+                document.getElementById("overviewTab").classList.add("active");
+                buildOverviewTab();
+            } else {
+                document.querySelector(".tab:nth-child(2)").classList.add("active");
+                document.getElementById("studentTab").classList.add("active");
+            }
+        }
+
+        function buildOverviewTab() {
+            const data = DB[currentMonth]?.[currentClass] || {};
+            const table = document.getElementById("overviewTable");
+            
+            // Build table header
+            let tableHTML = `
+                <thead>
+                    <tr>
+                        <th style="width: 25%; text-align: left;">Student</th>
+                        <th style="width: 12%;">P</th>
+                        <th style="width: 12%;">A</th>
+                        <th style="width: 12%;">AP</th>
+                        <th style="width: 13%;">Bonus</th>
+                        <th style="width: 13%;">Points</th>
+                        <th style="width: 13%;">%</th>
+                    </tr>
+                </thead>
+                <tbody>
+            `;
+            
+            // Build table rows
+            students[currentClass].forEach(student => {
+                let p = 0, a = 0, ap = 0;
+                
+                for (let date in data) {
+                    if (data[date][student] === "P") p++;
+                    else if (data[date][student] === "A") a++;
+                    else if (data[date][student] === "AP") ap++;
+                }
+                
+                const totalDays = p + a + ap;
+                const calc = calculateWithBonus(student, data);
+                const percentage = totalDays > 0 ? ((p / totalDays) * 100).toFixed(1) : 0;
+                
+                tableHTML += `
+                    <tr>
+                        <td style="text-align: left;"><strong>${student.split(' ')[0]}</strong></td>
+                        <td><span class="status-badge badge-present">${p}</span></td>
+                        <td><span class="status-badge badge-absent">${a}</span></td>
+                        <td><span class="status-badge badge-app">${ap}</span></td>
+                        <td><span class="points-badge bonus-badge">${calc.bonus}</span></td>
+                        <td><span class="points-badge ${calc.points >= 0 ? 'points-positive' : 'points-negative'}">${calc.points}</span></td>
+                        <td><strong style="color: ${percentage >= 75 ? 'var(--success)' : percentage >= 50 ? 'var(--warning)' : 'var(--danger)'}">${percentage}%</strong></td>
+                    </tr>
+                `;
+            });
+            
+            tableHTML += `</tbody>`;
+            table.innerHTML = tableHTML;
+        }
+
+        function buildStudentDropdown() {
+            const select = document.getElementById("studentSelect");
+            select.innerHTML = '<option value="">-- Select Student --</option>';
+            
+            students[currentClass].forEach(student => {
+                const option = document.createElement("option");
+                option.value = student;
+                option.textContent = student;
+                select.appendChild(option);
+            });
+        }
+
+        function showIndividualResult() {
+            const studentName = document.getElementById("studentSelect").value;
+            const container = document.getElementById("individualResultContainer");
+            
+            if (!studentName) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-user-graduate"></i>
+                        <h3>Select a Student</h3>
+                        <p>Detailed attendance report will appear here</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            const data = DB[currentMonth]?.[currentClass] || {};
+            let p = 0, a = 0, ap = 0;
+            
+            for (let date in data) {
+                if (data[date][studentName] === "P") p++;
+                else if (data[date][studentName] === "A") a++;
+                else if (data[date][studentName] === "AP") ap++;
+            }
+            
+            const totalDays = p + a + ap;
+            const calc = calculateWithBonus(studentName, data);
+            const percentage = totalDays > 0 ? ((p / totalDays) * 100).toFixed(1) : 0;
+            
+            // Calculate streak
+            let currentStreak = 0;
+            let maxStreak = 0;
+            let tempStreak = 0;
+            
+            const dates = Object.keys(data).sort();
+            for (let date of dates) {
+                if (data[date][studentName] === "P") {
+                    tempStreak++;
+                    currentStreak = tempStreak;
+                    if (tempStreak > maxStreak) maxStreak = tempStreak;
+                } else if (data[date][studentName] === "A") {
+                    tempStreak = 0;
+                    currentStreak = 0;
+                }
+            }
+            
+            // Build individual result
+            container.innerHTML = `
+                <div class="card">
+                    <h3 style="color: var(--primary); margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
+                        <i class="fas fa-user-circle"></i> ${studentName}
+                    </h3>
+                    
+                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 20px;">
+                        <div style="text-align: center; padding: 15px; background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(16, 185, 129, 0.2) 100%); border-radius: 10px; border: 2px solid rgba(16, 185, 129, 0.3);">
+                            <div style="font-size: 1.8rem; color: var(--success); font-weight: 700;">${p}</div>
+                            <div style="font-size: 0.85rem; color: var(--gray); margin-top: 5px;">Present Days</div>
+                        </div>
+                        <div style="text-align: center; padding: 15px; background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(239, 68, 68, 0.2) 100%); border-radius: 10px; border: 2px solid rgba(239, 68, 68, 0.3);">
+                            <div style="font-size: 1.8rem; color: var(--danger); font-weight: 700;">${a}</div>
+                            <div style="font-size: 0.85rem; color: var(--gray); margin-top: 5px;">Absent Days</div>
+                        </div>
+                        <div style="text-align: center; padding: 15px; background: linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(245, 158, 11, 0.2) 100%); border-radius: 10px; border: 2px solid rgba(245, 158, 11, 0.3);">
+                            <div style="font-size: 1.8rem; color: var(--warning); font-weight: 700;">${ap}</div>
+                            <div style="font-size: 0.85rem; color: var(--gray); margin-top: 5px;">Applications</div>
+                        </div>
+                        <div style="text-align: center; padding: 15px; background: linear-gradient(135deg, rgba(124, 58, 237, 0.1) 0%, rgba(124, 58, 237, 0.2) 100%); border-radius: 10px; border: 2px solid rgba(124, 58, 237, 0.3);">
+                            <div style="font-size: 1.8rem; color: var(--secondary); font-weight: 700;">${calc.bonus}</div>
+                            <div style="font-size: 0.85rem; color: var(--gray); margin-top: 5px;">Bonus Points</div>
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; justify-content: space-between; align-items: center; background: linear-gradient(135deg, rgba(79, 70, 229, 0.1) 0%, rgba(79, 70, 229, 0.2) 100%); padding: 20px; border-radius: 10px; margin-bottom: 20px; border: 2px solid rgba(79, 70, 229, 0.3);">
+                        <div>
+                            <div style="font-size: 2.5rem; color: var(--primary); font-weight: 700;">${percentage}%</div>
+                            <div style="font-size: 0.9rem; color: var(--gray);">Attendance</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 2.5rem; color: var(--success); font-weight: 700;">${calc.points}</div>
+                            <div style="font-size: 0.9rem; color: var(--gray);">Total Points</div>
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; justify-content: space-around; text-align: center;">
+                        <div>
+                            <div style="font-size: 1.5rem; color: var(--dark); font-weight: 700;">${currentStreak}</div>
+                            <div style="font-size: 0.8rem; color: var(--gray);">Current Streak</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 1.5rem; color: var(--dark); font-weight: 700;">${maxStreak}</div>
+                            <div style="font-size: 0.8rem; color: var(--gray);">Best Streak</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Initialize the application
+        function init() {
+            initializeSampleData();
+            setMarkingMode("P");
+            
+            // Set current month as default
+            const now = new Date();
+            const currentMonthStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+            document.getElementById("monthInput").value = currentMonthStr;
+            
+            showNotification("Smart Attendance System Ready! Select class to begin.", "success");
+        }
+
+        // Start the application
+        window.onload = init;
+    </script>
 </body>
 </html>
