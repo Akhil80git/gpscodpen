@@ -1,618 +1,135 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Location Access & QR Generator</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        
-        body {
-            background: linear-gradient(135deg, #1a2980, #26d0ce);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
-        
-        .container {
-            background-color: rgba(255, 255, 255, 0.95);
-            border-radius: 20px;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
-            width: 100%;
-            max-width: 900px;
-            overflow: hidden;
-            padding: 30px;
-        }
-        
-        .header {
-            text-align: center;
-            margin-bottom: 30px;
-            padding-bottom: 20px;
-            border-bottom: 2px solid #f0f0f0;
-        }
-        
-        .header h1 {
-            color: #1a2980;
-            font-size: 2.5rem;
-            margin-bottom: 10px;
-        }
-        
-        .header p {
-            color: #555;
-            font-size: 1.1rem;
-        }
-        
-        .main-content {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 30px;
-        }
-        
-        .setup-section, .verification-section {
-            flex: 1;
-            min-width: 300px;
-            background: white;
-            border-radius: 15px;
-            padding: 25px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-        }
-        
-        .section-title {
-            color: #1a2980;
-            font-size: 1.5rem;
-            margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid #eee;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .section-title i {
-            color: #26d0ce;
-        }
-        
-        .input-group {
-            margin-bottom: 20px;
-        }
-        
-        .input-group label {
-            display: block;
-            margin-bottom: 8px;
-            color: #333;
-            font-weight: 600;
-        }
-        
-        .input-group input, .input-group select {
-            width: 100%;
-            padding: 12px 15px;
-            border: 2px solid #ddd;
-            border-radius: 10px;
-            font-size: 16px;
-            transition: all 0.3s;
-        }
-        
-        .input-group input:focus, .input-group select:focus {
-            border-color: #26d0ce;
-            outline: none;
-        }
-        
-        .unit-selector {
-            display: flex;
-            margin-top: 10px;
-            gap: 15px;
-        }
-        
-        .unit-option {
-            flex: 1;
-            text-align: center;
-            padding: 10px;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        
-        .unit-option.selected {
-            background-color: #1a2980;
-            color: white;
-            border-color: #1a2980;
-        }
-        
-        .button {
-            background: linear-gradient(to right, #1a2980, #26d0ce);
-            color: white;
-            border: none;
-            padding: 15px 25px;
-            font-size: 16px;
-            font-weight: 600;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            width: 100%;
-            margin-top: 10px;
-        }
-        
-        .button:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 7px 15px rgba(26, 41, 128, 0.3);
-        }
-        
-        .button:active {
-            transform: translateY(-1px);
-        }
-        
-        .status-message {
-            padding: 15px;
-            border-radius: 10px;
-            margin-top: 20px;
-            text-align: center;
-            font-weight: 600;
-            display: none;
-        }
-        
-        .success {
-            background-color: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-            display: block;
-        }
-        
-        .error {
-            background-color: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-            display: block;
-        }
-        
-        .info {
-            background-color: #d1ecf1;
-            color: #0c5460;
-            border: 1px solid #bee5eb;
-            display: block;
-        }
-        
-        .qr-container {
-            text-align: center;
-            margin-top: 25px;
-            padding: 20px;
-            border-radius: 10px;
-            background-color: #f9f9f9;
-            display: none;
-        }
-        
-        .qr-code {
-            margin: 20px auto;
-            padding: 10px;
-            background: white;
-            border-radius: 10px;
-            display: inline-block;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-        }
-        
-        .gps-info {
-            display: flex;
-            justify-content: space-between;
-            background-color: #f0f8ff;
-            padding: 15px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-        }
-        
-        .gps-info div {
-            text-align: center;
-        }
-        
-        .gps-info div span {
-            display: block;
-            font-weight: 600;
-            color: #1a2980;
-            font-size: 1.2rem;
-        }
-        
-        .gps-info div label {
-            font-size: 0.9rem;
-            color: #666;
-        }
-        
-        .distance-info {
-            background-color: #f0f8ff;
-            padding: 15px;
-            border-radius: 10px;
-            margin-top: 20px;
-            text-align: center;
-        }
-        
-        .distance-info span {
-            font-weight: 600;
-            color: #1a2980;
-            font-size: 1.2rem;
-        }
-        
-        @media (max-width: 768px) {
-            .main-content {
-                flex-direction: column;
-            }
-            
-            .header h1 {
-                font-size: 2rem;
-            }
-        }
-        
-        .footer {
-            text-align: center;
-            margin-top: 30px;
-            color: #777;
-            font-size: 0.9rem;
-            padding-top: 20px;
-            border-top: 1px solid #eee;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <div class="header">
-            <h1><i class="fas fa-map-marker-alt"></i> GPS Location Scanner</h1>
-            <p>Set your location and radius, then verify if you're within the allowed area to generate a QR code</p>
-        </div>
-        
-        <div class="main-content">
-            <div class="setup-section">
-                <h2 class="section-title"><i class="fas fa-cogs"></i> Setup Location & Radius</h2>
-                
-                <div class="input-group">
-                    <label for="latitude">Latitude</label>
-                    <input type="number" id="latitude" step="any" placeholder="e.g., 28.6139">
-                </div>
-                
-                <div class="input-group">
-                    <label for="longitude">Longitude</label>
-                    <input type="number" id="longitude" step="any" placeholder="e.g., 77.2090">
-                </div>
-                
-                <div class="input-group">
-                    <label for="radius">Radius</label>
-                    <input type="number" id="radius" placeholder="e.g., 100">
-                    
-                    <div class="unit-selector">
-                        <div class="unit-option" id="unit-meters">Meters</div>
-                        <div class="unit-option selected" id="unit-km">Kilometers</div>
-                    </div>
-                </div>
-                
-                <button class="button" id="saveLocationBtn">
-                    <i class="fas fa-save"></i> Save Location & Radius
-                </button>
-                
-                <div id="setupStatus" class="status-message"></div>
-            </div>
-            
-            <div class="verification-section">
-                <h2 class="section-title"><i class="fas fa-satellite-dish"></i> Verify Location & Generate QR</h2>
-                
-                <div class="gps-info">
-                    <div>
-                        <label>Your Latitude</label>
-                        <span id="currentLat">--</span>
-                    </div>
-                    <div>
-                        <label>Your Longitude</label>
-                        <span id="currentLng">--</span>
-                    </div>
-                </div>
-                
-                <button class="button" id="checkLocationBtn">
-                    <i class="fas fa-search-location"></i> Check My Location
-                </button>
-                
-                <div id="verificationStatus" class="status-message"></div>
-                
-                <div class="distance-info">
-                    <label>Distance from Allowed Location</label>
-                    <span id="distance">--</span>
-                </div>
-                
-                <div class="qr-container" id="qrContainer">
-                    <h3><i class="fas fa-qrcode"></i> Your Generated QR Code</h3>
-                    <div class="qr-code" id="qrCode">
-                        <!-- QR code will be generated here -->
-                    </div>
-                    <p>Scan this QR code for verification</p>
-                    <button class="button" id="downloadQRBtn" style="margin-top: 15px; max-width: 200px;">
-                        <i class="fas fa-download"></i> Download QR
-                    </button>
-                </div>
-            </div>
-        </div>
-        
-        <div class="footer">
-            <p>This system works entirely in your browser - no data is sent to any server</p>
-            <p>Made with HTML, CSS, and JavaScript <i class="fas fa-heart" style="color:#e74c3c;"></i></p>
-        </div>
-    </div>
+<meta charset="UTF-8">
+<title>Advanced QR Scanner System</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <script>
-        // DOM Elements
-        const latitudeInput = document.getElementById('latitude');
-        const longitudeInput = document.getElementById('longitude');
-        const radiusInput = document.getElementById('radius');
-        const unitMeters = document.getElementById('unit-meters');
-        const unitKm = document.getElementById('unit-km');
-        const saveLocationBtn = document.getElementById('saveLocationBtn');
-        const setupStatus = document.getElementById('setupStatus');
-        const checkLocationBtn = document.getElementById('checkLocationBtn');
-        const currentLatElement = document.getElementById('currentLat');
-        const currentLngElement = document.getElementById('currentLng');
-        const verificationStatus = document.getElementById('verificationStatus');
-        const distanceElement = document.getElementById('distance');
-        const qrContainer = document.getElementById('qrContainer');
-        const qrCodeElement = document.getElementById('qrCode');
-        const downloadQRBtn = document.getElementById('downloadQRBtn');
-        
-        // State variables
-        let savedLocation = null;
-        let savedRadius = null;
-        let radiusUnit = 'km'; // Default unit
-        let currentLocation = null;
-        
-        // Set up event listeners for unit selection
-        unitMeters.addEventListener('click', () => {
-            unitMeters.classList.add('selected');
-            unitKm.classList.remove('selected');
-            radiusUnit = 'meters';
-        });
-        
-        unitKm.addEventListener('click', () => {
-            unitKm.classList.add('selected');
-            unitMeters.classList.remove('selected');
-            radiusUnit = 'km';
-        });
-        
-        // Save location and radius
-        saveLocationBtn.addEventListener('click', () => {
-            const lat = parseFloat(latitudeInput.value);
-            const lng = parseFloat(longitudeInput.value);
-            const radius = parseFloat(radiusInput.value);
-            
-            if (isNaN(lat) || isNaN(lng) || isNaN(radius)) {
-                showStatus(setupStatus, 'Please enter valid latitude, longitude, and radius values.', 'error');
-                return;
-            }
-            
-            if (lat < -90 || lat > 90) {
-                showStatus(setupStatus, 'Latitude must be between -90 and 90 degrees.', 'error');
-                return;
-            }
-            
-            if (lng < -180 || lng > 180) {
-                showStatus(setupStatus, 'Longitude must be between -180 and 180 degrees.', 'error');
-                return;
-            }
-            
-            if (radius <= 0) {
-                showStatus(setupStatus, 'Radius must be a positive number.', 'error');
-                return;
-            }
-            
-            savedLocation = { lat, lng };
-            savedRadius = radius;
-            
-            const unitText = radiusUnit === 'km' ? 'kilometers' : 'meters';
-            showStatus(setupStatus, `Location saved! Allowed area: ${radius} ${unitText} from (${lat.toFixed(4)}, ${lng.toFixed(4)})`, 'success');
-        });
-        
-        // Check current location
-        checkLocationBtn.addEventListener('click', () => {
-            if (!savedLocation || !savedRadius) {
-                showStatus(verificationStatus, 'Please set up a location and radius first.', 'error');
-                return;
-            }
-            
-            showStatus(verificationStatus, 'Getting your current location...', 'info');
-            
-            // Get current position using Geolocation API
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(
-                    position => {
-                        currentLocation = {
-                            lat: position.coords.latitude,
-                            lng: position.coords.longitude
-                        };
-                        
-                        // Update display with current coordinates
-                        currentLatElement.textContent = currentLocation.lat.toFixed(6);
-                        currentLngElement.textContent = currentLocation.lng.toFixed(6);
-                        
-                        // Calculate distance
-                        const distance = calculateDistance(
-                            savedLocation.lat, savedLocation.lng,
-                            currentLocation.lat, currentLocation.lng,
-                            radiusUnit
-                        );
-                        
-                        // Display distance
-                        const unitText = radiusUnit === 'km' ? 'km' : 'm';
-                        distanceElement.textContent = `${distance.toFixed(2)} ${unitText}`;
-                        
-                        // Check if within radius
-                        const radiusInMeters = radiusUnit === 'km' ? savedRadius * 1000 : savedRadius;
-                        const distanceInMeters = radiusUnit === 'km' ? distance * 1000 : distance;
-                        
-                        if (distanceInMeters <= radiusInMeters) {
-                            showStatus(verificationStatus, 'Success! You are within the allowed radius. QR code generated.', 'success');
-                            generateQRCode();
-                        } else {
-                            showStatus(verificationStatus, `You are NOT allowed. You are ${distance.toFixed(2)} ${unitText} away from the allowed location.`, 'error');
-                            qrContainer.style.display = 'none';
-                        }
-                    },
-                    error => {
-                        let errorMessage = 'Unable to retrieve your location. ';
-                        switch(error.code) {
-                            case error.PERMISSION_DENIED:
-                                errorMessage += 'Permission denied. Please enable location access.';
-                                break;
-                            case error.POSITION_UNAVAILABLE:
-                                errorMessage += 'Location information is unavailable.';
-                                break;
-                            case error.TIMEOUT:
-                                errorMessage += 'Location request timed out.';
-                                break;
-                            default:
-                                errorMessage += 'An unknown error occurred.';
-                        }
-                        showStatus(verificationStatus, errorMessage, 'error');
-                    },
-                    { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
-                );
-            } else {
-                showStatus(verificationStatus, 'Geolocation is not supported by your browser.', 'error');
-            }
-        });
-        
-        // Generate QR code
-        function generateQRCode() {
-            // Clear previous QR code
-            qrCodeElement.innerHTML = '';
-            
-            // Create data for QR code
-            const qrData = {
-                timestamp: new Date().toISOString(),
-                verifiedLocation: savedLocation,
-                currentLocation: currentLocation,
-                verification: "VALID"
-            };
-            
-            const qrDataString = JSON.stringify(qrData, null, 2);
-            
-            // Generate QR code using a simple method (for demo purposes)
-            // In a real application, you would use a QR code library like qrcode.js
-            qrCodeElement.innerHTML = `
-                <div style="padding: 20px; text-align: center;">
-                    <div style="font-size: 60px; color: #1a2980; margin-bottom: 10px;">
-                        <i class="fas fa-check-circle"></i>
-                    </div>
-                    <h3 style="color: #1a2980; margin-bottom: 10px;">Location Verified</h3>
-                    <p style="color: #555; font-size: 14px; margin-bottom: 10px;">
-                        <strong>Allowed Area:</strong><br>
-                        ${savedRadius} ${radiusUnit === 'km' ? 'km' : 'm'} from<br>
-                        (${savedLocation.lat.toFixed(6)}, ${savedLocation.lng.toFixed(6)})
-                    </p>
-                    <p style="color: #555; font-size: 14px;">
-                        <strong>Your Location:</strong><br>
-                        (${currentLocation.lat.toFixed(6)}, ${currentLocation.lng.toFixed(6)})
-                    </p>
-                    <div style="margin-top: 15px; padding: 10px; background: #f0f8ff; border-radius: 5px; font-family: monospace; font-size: 12px;">
-                        ${qrDataString.substring(0, 50)}...
-                    </div>
-                </div>
-            `;
-            
-            // Show QR container
-            qrContainer.style.display = 'block';
+<!-- QR Generator -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+<!-- QR Scanner -->
+<script src="https://unpkg.com/html5-qrcode"></script>
+
+<style>
+body{
+    background:#020617;
+    color:#fff;
+    font-family:Arial;
+    text-align:center;
+    padding:15px;
+}
+button{
+    padding:10px 18px;
+    border:none;
+    border-radius:8px;
+    font-size:15px;
+    cursor:pointer;
+    margin:5px;
+}
+.gen{background:#22c55e;}
+.scan{background:#3b82f6;}
+#qrContainer{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+    gap:15px;
+    margin-top:20px;
+}
+.box{
+    background:#0f172a;
+    padding:12px;
+    border-radius:12px;
+}
+#reader{
+    width:300px;
+    margin:auto;
+}
+.result{
+    margin-top:15px;
+    font-size:16px;
+    color:#22c55e;
+    word-break:break-all;
+}
+</style>
+</head>
+
+<body>
+
+<h2>🔐 QR Generator + Scanner</h2>
+
+<button class="gen" onclick="generateQR()">➕ New QR</button>
+<button class="scan" onclick="startCamera()">📷 Camera Scan</button>
+<button class="scan" onclick="scanImage()">📤 Upload Scan</button>
+
+<div id="qrContainer"></div>
+
+<div id="reader" style="display:none"></div>
+<div class="result" id="scanResult"></div>
+
+<input type="file" id="fileInput" accept="image/*" hidden>
+
+<script>
+const FIXED_NUMBER = "38373";
+
+// Generate Unique ID
+function uniqueID(){
+    return Math.random().toString(36).substring(2,8).toUpperCase();
+}
+
+// Generate QR
+function generateQR(){
+    const data = `${FIXED_NUMBER}-UID-${uniqueID()}`;
+
+    const box = document.createElement("div");
+    box.className = "box";
+
+    const div = document.createElement("div");
+    box.appendChild(div);
+
+    document.getElementById("qrContainer").prepend(box);
+
+    new QRCode(div,{
+        text:data,
+        width:150,
+        height:150
+    });
+}
+
+// CAMERA SCAN
+function startCamera(){
+    document.getElementById("reader").style.display="block";
+
+    const html5QrCode = new Html5Qrcode("reader");
+    html5QrCode.start(
+        { facingMode: "environment" },
+        { fps: 10, qrbox: 250 },
+        qr => {
+            document.getElementById("scanResult").innerText =
+            "✅ Scanned Data: " + qr;
+            html5QrCode.stop();
         }
-        
-        // Download QR code button
-        downloadQRBtn.addEventListener('click', () => {
-            // Create a canvas to "download" the QR (simulated for this demo)
-            const canvas = document.createElement('canvas');
-            const ctx = canvas.getContext('2d');
-            canvas.width = 300;
-            canvas.height = 400;
-            
-            // Fill background
-            ctx.fillStyle = 'white';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-            
-            // Draw QR box
-            ctx.fillStyle = '#1a2980';
-            ctx.fillRect(50, 50, 200, 200);
-            
-            ctx.fillStyle = '#26d0ce';
-            ctx.fillRect(60, 60, 180, 180);
-            
-            // Draw check mark
-            ctx.fillStyle = 'white';
-            ctx.font = '60px Arial';
-            ctx.textAlign = 'center';
-            ctx.fillText('✓', 150, 140);
-            
-            // Draw text
-            ctx.fillStyle = '#1a2980';
-            ctx.font = 'bold 16px Arial';
-            ctx.fillText('LOCATION VERIFIED', 150, 200);
-            
-            ctx.fillStyle = '#333';
-            ctx.font = '12px Arial';
-            ctx.fillText(`Lat: ${currentLocation.lat.toFixed(4)}`, 150, 230);
-            ctx.fillText(`Lng: ${currentLocation.lng.toFixed(4)}`, 150, 250);
-            ctx.fillText(new Date().toLocaleString(), 150, 270);
-            
-            // Convert to image and trigger download
-            const link = document.createElement('a');
-            link.download = 'location-qr-code.png';
-            link.href = canvas.toDataURL('image/png');
-            link.click();
-            
-            // Show confirmation
-            alert('QR code downloaded successfully!');
-        });
-        
-        // Helper function to show status messages
-        function showStatus(element, message, type) {
-            element.textContent = message;
-            element.className = `status-message ${type}`;
-            element.style.display = 'block';
-            
-            // Auto-hide success messages after 5 seconds
-            if (type === 'success') {
-                setTimeout(() => {
-                    element.style.display = 'none';
-                }, 5000);
-            }
-        }
-        
-        // Helper function to calculate distance between two coordinates
-        // Using Haversine formula
-        function calculateDistance(lat1, lon1, lat2, lon2, unit) {
-            const R = 6371; // Earth's radius in kilometers
-            const dLat = (lat2 - lat1) * Math.PI / 180;
-            const dLon = (lon2 - lon1) * Math.PI / 180;
-            
-            const a = 
-                Math.sin(dLat/2) * Math.sin(dLat/2) +
-                Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
-                Math.sin(dLon/2) * Math.sin(dLon/2);
-            
-            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-            let distance = R * c; // Distance in kilometers
-            
-            // Convert to meters if needed
-            if (unit === 'meters') {
-                distance = distance * 1000;
-            }
-            
-            return distance;
-        }
-        
-        // Set some default values for demo
-        window.addEventListener('DOMContentLoaded', () => {
-            latitudeInput.value = "28.6139";
-            longitudeInput.value = "77.2090";
-            radiusInput.value = "5";
-        });
-    </script>
+    );
+}
+
+// IMAGE UPLOAD SCAN
+function scanImage(){
+    document.getElementById("fileInput").click();
+}
+
+document.getElementById("fileInput").addEventListener("change", e=>{
+    const file = e.target.files[0];
+    const html5QrCode = new Html5Qrcode("reader");
+
+    html5QrCode.scanFile(file,true)
+    .then(qr=>{
+        document.getElementById("scanResult").innerText =
+        "✅ Scanned Data: " + qr;
+    })
+    .catch(()=>{
+        alert("QR not detected");
+    });
+});
+</script>
+
 </body>
 </html>
